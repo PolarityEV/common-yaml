@@ -42,6 +42,7 @@
 // RESERVED 122-129
 #define SKUDAK_ERR_CAN_RX_FIFO0      (130)
 #define SKUDAK_ERR_CAN_RX_FIFO1      (131)
+#define SKUDAK_ERR_CAN_RX_MSG        (132)
 
 /* TIM Errors 140-159 */
 #define SKUDAK_ERR_TIM1              (140)
