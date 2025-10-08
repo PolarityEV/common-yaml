@@ -14,6 +14,19 @@
 #define SKUDAK_COMMON_H_
 
 /**
+ * VCU I2C Communication Modes 0-99
+ */
+/* VCU I2C Info & Status Modes */
+#define VCU_I2C_INFO                   (0)   ///< VCU information (version, BMS type, etc.)
+#define VCU_I2C_ERR_CODES              (1)   ///< Error codes
+#define VCU_I2C_LDU_STATE              (10)  ///< LDU state
+
+/* BMS Data Modes */
+#define VCU_I2C_BMS                    (20)  ///< BMS cell voltage data (Tesla/Volt: 192 bytes, VW: 416 bytes)
+#define VCU_I2C_BMS_TEMPS              (21)  ///< VW BMS temperature data (48 temps × uint16_t = 96 bytes)
+#define VCU_I2C_BMS_MODULE_INFO        (22)  ///< VW BMS module presence (16 modules × uint8_t = 16 bytes)
+
+/**
  * VCU Eerrors 100-254
  */
 /* I2C Errors 100-109 */
