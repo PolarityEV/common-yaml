@@ -1,0 +1,64 @@
+/**
+ * @file polarity_errors.h
+ * @brief {{ project_name }} Error Code Definitions
+ * @version {{ version }}
+ *
+ * AUTO-GENERATED FILE - DO NOT EDIT MANUALLY
+ * Generated: {{ generated_date }}
+ * Source: definitions.yaml
+ *
+ * This file contains error code definitions for {{ project_name }} projects.
+ * Compatible with: C (STM32, ESP32), C++
+ *
+ * To regenerate this file, run:
+ *   python generate.py
+ *
+ * @copyright Copyright (c) {{ generated_date[:4] }} Polarity EV
+ */
+
+#ifndef POLARITY_ERRORS_H_
+#define POLARITY_ERRORS_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @defgroup ErrorCodes Error Code Definitions
+ * @{
+ */
+
+{% for category_name, category_data in categories.items() %}
+/**
+ * @name {{ category_name }} Errors ({{ category_data.range[0] }}-{{ category_data.range[1] }})
+ * @brief {{ category_data.description }}
+ * @{
+ */
+{% for error in category_data.errors %}
+/** {{ error.description }} */
+#define {{ prefix }}_{{ error.name }}{{ ' ' * (30 - (prefix|length + error.name|length)) }}({{ error.code }})
+{% endfor %}
+/** @} */
+
+{% endfor %}
+/** @} */ // End of ErrorCodes group
+
+/*
+ * Backward Compatibility Aliases (DEPRECATED)
+ *
+ * These aliases maintain compatibility with legacy code using SKUDAK_ERR_* naming.
+ * New code should use {{ prefix }}_* constants.
+ *
+ * These will be removed in a future version.
+ */
+#ifdef POLARITY_ENABLE_LEGACY_NAMES
+{% for old_name, new_name in legacy_mapping.items() %}
+#define {{ old_name }}{{ ' ' * (40 - old_name|length) }}{{ new_name }}
+{% endfor %}
+#endif /* POLARITY_ENABLE_LEGACY_NAMES */
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* POLARITY_ERRORS_H_ */

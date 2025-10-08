@@ -1,0 +1,120 @@
+// polarity_errors.dart
+//
+// {{ project_name }} Error Code Definitions
+// Version: {{ version }}
+//
+// AUTO-GENERATED FILE - DO NOT EDIT MANUALLY
+// Generated: {{ generated_date }}
+// Source: definitions.yaml
+//
+// This file contains error code definitions for {{ project_name }} Flutter/Dart projects.
+//
+// To regenerate this file, run:
+//   python generate.py
+//
+// Copyright (c) {{ generated_date[:4] }} Polarity EV
+
+/// Error code definitions for {{ project_name }} VCU
+///
+/// This class provides constants for all VCU error codes with
+/// human-readable descriptions for display in the UI.
+class PolarityErrors {
+  // Private constructor to prevent instantiation
+  PolarityErrors._();
+
+{% set current_category = namespace(name='') %}
+{% for error in all_errors %}
+{% if error.category != current_category.name %}
+{% set current_category.name = error.category %}
+  // ========================================================================
+  // {{ error.category }} Errors
+  // {{ error.category_desc }}
+  // ========================================================================
+
+{% endif %}
+  /// {{ error.description }}
+  static const int {{ error.dart_name }} = {{ error.code }};
+{% endfor %}
+  // ========================================================================
+  // Error Descriptions
+  // ========================================================================
+
+  /// Map of error codes to human-readable descriptions
+  static const Map<int, String> descriptions = {
+{% for error in all_errors %}
+    {{ error.code }}: '{{ error.description }}',
+{% endfor %}
+  };
+
+  /// Map of error codes to severity levels
+  static const Map<int, String> severities = {
+{% for error in all_errors %}
+    {{ error.code }}: '{{ error.severity }}',
+{% endfor %}
+  };
+
+  /// Map of error codes to category names
+  static const Map<int, String> categories = {
+{% for error in all_errors %}
+    {{ error.code }}: '{{ error.category }}',
+{% endfor %}
+  };
+
+  // ========================================================================
+  // Helper Methods
+  // ========================================================================
+
+  /// Get human-readable description for an error code
+  ///
+  /// Returns the description if found, otherwise returns a default message.
+  ///
+  /// Example:
+  /// ```dart
+  /// String message = PolarityErrors.getDescription(100);
+  /// // Returns: "I2C slave transmit failed"
+  /// ```
+  static String getDescription(int errorCode) {
+    return descriptions[errorCode] ?? 'Unknown error ($errorCode)';
+  }
+
+  /// Get severity level for an error code
+  ///
+  /// Returns: 'critical', 'error', or 'warning'
+  static String getSeverity(int errorCode) {
+    return severities[errorCode] ?? 'unknown';
+  }
+
+  /// Get category name for an error code
+  ///
+  /// Returns the category (e.g., 'I2C', 'CAN', 'TIM')
+  static String getCategory(int errorCode) {
+    return categories[errorCode] ?? 'UNKNOWN';
+  }
+
+  /// Check if an error code is critical
+  static bool isCritical(int errorCode) {
+    return getSeverity(errorCode) == 'critical';
+  }
+
+  /// Check if an error code is valid
+  static bool isValid(int errorCode) {
+    return descriptions.containsKey(errorCode);
+  }
+
+  /// Get a formatted error message
+  ///
+  /// Example:
+  /// ```dart
+  /// String message = PolarityErrors.formatError(100);
+  /// // Returns: "[I2C] I2C slave transmit failed (Code: 100)"
+  /// ```
+  static String formatError(int errorCode) {
+    if (!isValid(errorCode)) {
+      return 'Unknown error code: $errorCode';
+    }
+
+    final category = getCategory(errorCode);
+    final description = getDescription(errorCode);
+    return '[$category] $description (Code: $errorCode)';
+  }
+}
