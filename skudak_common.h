@@ -14,17 +14,20 @@
 #define SKUDAK_COMMON_H_
 
 /**
- * VCU I2C Communication Modes 0-99
+ * VCU I2C Communication Modes
+ *
+ * These command codes match I2C_PROTOCOL.md specification.
+ * BREAKING CHANGE: Updated from legacy values (0, 1, 10, 20, 21, 22)
+ * to match STM32 VCU firmware protocol (0x01, 0x02, 0x04, 0x05, 0x06).
  */
 /* VCU I2C Info & Status Modes */
-#define VCU_I2C_INFO                   (0)   ///< VCU information (version, BMS type, etc.)
-#define VCU_I2C_ERR_CODES              (1)   ///< Error codes
-#define VCU_I2C_LDU_STATE              (10)  ///< LDU state
+#define VCU_I2C_INFO                   (0x01)  ///< VCU version and BMS type (4 bytes: major, minor, patch, bms_type)
+#define VCU_I2C_LDU_STATE              (0x02)  ///< LDU state (7 bytes: amperage, voltage, motor temp, dcdc temp, direction)
 
 /* BMS Data Modes */
-#define VCU_I2C_BMS                    (20)  ///< BMS cell voltage data (Tesla/Volt: 192 bytes, VW: 416 bytes)
-#define VCU_I2C_BMS_TEMPS              (21)  ///< VW BMS temperature data (48 temps × uint16_t = 96 bytes)
-#define VCU_I2C_BMS_MODULE_INFO        (22)  ///< VW BMS module presence (16 modules × uint8_t = 16 bytes)
+#define VCU_I2C_BMS                    (0x04)  ///< BMS cell voltage data (Tesla/Volt: 192 bytes, VW: 416 bytes)
+#define VCU_I2C_BMS_TEMPS              (0x05)  ///< VW BMS temperature data (48 temps × uint16_t = 96 bytes)
+#define VCU_I2C_BMS_MODULE_INFO        (0x06)  ///< VW BMS module presence (16 modules × uint8_t = 16 bytes)
 
 /**
  * VCU Eerrors 100-254
