@@ -126,6 +126,11 @@ categories:
         description: "CAN receive message failed"
         severity: "error"
 
+      - name: "CAN_QUEUE_FULL"
+        code: 133
+        description: "CAN message queue overflow (messages dropped)"
+        severity: "warning"
+
   TIM:
     range: [140, 159]
     description: "Timer peripheral errors"
@@ -258,6 +263,7 @@ legacy_mapping:
   SKUDAK_ERR_CAN_RX_FIFO0: POLARITY_ERR_CAN_RX_FIFO0
   SKUDAK_ERR_CAN_RX_FIFO1: POLARITY_ERR_CAN_RX_FIFO1
   SKUDAK_ERR_CAN_RX_MSG: POLARITY_ERR_CAN_RX_MSG
+  SKUDAK_ERR_CAN_QUEUE_FULL: POLARITY_ERR_CAN_QUEUE_FULL
   SKUDAK_ERR_TIM1: POLARITY_ERR_TIM1
   SKUDAK_ERR_TIM2: POLARITY_ERR_TIM2
   SKUDAK_ERR_TIM3: POLARITY_ERR_TIM3

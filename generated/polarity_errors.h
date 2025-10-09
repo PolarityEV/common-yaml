@@ -4,7 +4,7 @@
  * @version 1.0.0
  *
  * AUTO-GENERATED FILE - DO NOT EDIT MANUALLY
- * Generated: 2025-10-08 19:04:24
+ * Generated: 2025-10-09 15:01:43
  * Source: definitions.yaml
  *
  * This file contains error code definitions for Polarity projects.
@@ -84,6 +84,8 @@ extern "C" {
 #define POLARITY_ERR_CAN_RX_FIFO1      (131)
 /** CAN receive message failed */
 #define POLARITY_ERR_CAN_RX_MSG        (132)
+/** CAN message queue overflow (messages dropped) */
+#define POLARITY_ERR_CAN_QUEUE_FULL    (133)
 /** @} */
 
 /**
@@ -178,6 +180,7 @@ extern "C" {
 #define SKUDAK_ERR_CAN_RX_FIFO0                 POLARITY_ERR_CAN_RX_FIFO0
 #define SKUDAK_ERR_CAN_RX_FIFO1                 POLARITY_ERR_CAN_RX_FIFO1
 #define SKUDAK_ERR_CAN_RX_MSG                   POLARITY_ERR_CAN_RX_MSG
+#define SKUDAK_ERR_CAN_QUEUE_FULL               POLARITY_ERR_CAN_QUEUE_FULL
 #define SKUDAK_ERR_TIM1                         POLARITY_ERR_TIM1
 #define SKUDAK_ERR_TIM2                         POLARITY_ERR_TIM2
 #define SKUDAK_ERR_TIM3                         POLARITY_ERR_TIM3

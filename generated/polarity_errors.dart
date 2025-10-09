@@ -4,7 +4,7 @@
 // Version: 1.0.0
 //
 // AUTO-GENERATED FILE - DO NOT EDIT MANUALLY
-// Generated: 2025-10-08 19:04:24
+// Generated: 2025-10-09 15:01:43
 // Source: definitions.yaml
 //
 // This file contains error code definitions for Polarity Flutter/Dart projects.
@@ -76,6 +76,8 @@ class PolarityErrors {
   static const int canRxFifo1 = 131;
   /// CAN receive message failed
   static const int canRxMsg = 132;
+  /// CAN message queue overflow (messages dropped)
+  static const int canQueueFull = 133;
   // ========================================================================
   // TIM Errors
   // Timer peripheral errors
@@ -157,6 +159,7 @@ class PolarityErrors {
     130: 'CAN RX FIFO0 error',
     131: 'CAN RX FIFO1 error',
     132: 'CAN receive message failed',
+    133: 'CAN message queue overflow (messages dropped)',
     140: 'Timer 1 operation failed',
     141: 'Timer 2 operation failed',
     142: 'Timer 3 operation failed',
@@ -202,6 +205,7 @@ class PolarityErrors {
     130: 'warning',
     131: 'warning',
     132: 'error',
+    133: 'warning',
     140: 'error',
     141: 'error',
     142: 'error',
@@ -247,6 +251,7 @@ class PolarityErrors {
     130: 'CAN',
     131: 'CAN',
     132: 'CAN',
+    133: 'CAN',
     140: 'TIM',
     141: 'TIM',
     142: 'TIM',
