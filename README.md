@@ -2,6 +2,21 @@
 
 **Single source of truth for error codes across all Polarity platforms**
 
+## ⚠️ IMPORTANT: Headers Are Generated - NOT Committed!
+
+**The C headers (`polarity_errors.h`, `skudak_common.h`) are NOT committed to this repository.**
+
+You MUST generate them before building:
+
+```bash
+pip3 install pyyaml jinja2
+python3 generate.py
+```
+
+This ensures headers always match `definitions.yaml` and prevents version control conflicts with generated code.
+
+---
+
 This directory contains the code generation system for Polarity error codes. From a single YAML definition file, we generate language-specific error code files for:
 - **C** (STM32, ESP32)
 - **Dart** (Flutter mobile app)
