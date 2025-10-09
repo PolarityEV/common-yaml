@@ -1,8 +1,12 @@
 # Generated files - these should not be committed
 # Always run 'python3 generate.py' to regenerate these files
-generated/
+generated/polarity_errors.h
+generated/polarity_errors.dart
 polarity_errors.h
-skudak_common.h
+
+# Exception: skudak_common.h is manually maintained, not auto-generated
+# It contains I2C protocol constants and should be committed
+!generated/skudak_common.h
 
 # Python
 *.pyc
