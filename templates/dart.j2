@@ -60,6 +60,24 @@ class PolarityErrors {
 {% endfor %}
   };
 
+  /// Map of error codes to source information
+  static const Map<int, String> sources = {
+{% for error in all_errors %}
+{% if error.source %}
+    {{ error.code }}: '{{ error.source }}',
+{% endif %}
+{% endfor %}
+  };
+
+  /// Map of error codes to recommended actions
+  static const Map<int, String> actions = {
+{% for error in all_errors %}
+{% if error.action %}
+    {{ error.code }}: '{{ error.action }}',
+{% endif %}
+{% endfor %}
+  };
+
   // ========================================================================
   // Helper Methods
   // ========================================================================
@@ -116,5 +134,78 @@ class PolarityErrors {
     final category = getCategory(errorCode);
     final description = getDescription(errorCode);
     return '[$category] $description (Code: $errorCode)';
+  }
+
+  /// Get source component for an error code
+  ///
+  /// Returns: 'STM32_VCU', 'LDU_MOTOR', 'ESP32_GATEWAY', or 'UNKNOWN'
+  static String getSource(int errorCode) {
+    return sources[errorCode] ?? 'UNKNOWN';
+  }
+
+  /// Get recommended action for an error code
+  ///
+  /// Returns the recommended user action, or a default message if not defined
+  static String getAction(int errorCode) {
+    return actions[errorCode] ?? 'Contact support for assistance';
+  }
+
+  /// Get icon name for error severity (for UI rendering)
+  ///
+  /// Returns Flutter Icons-compatible icon name
+  static String getSeverityIcon(int errorCode) {
+    switch (getSeverity(errorCode)) {
+      case 'critical':
+        return 'error';
+      case 'error':
+        return 'warning';
+      case 'warning':
+        return 'info';
+      default:
+        return 'help';
+    }
+  }
+
+  /// Get color name for error severity (for UI theming)
+  ///
+  /// Returns color name compatible with app theme
+  static String getSeverityColor(int errorCode) {
+    switch (getSeverity(errorCode)) {
+      case 'critical':
+        return 'red';
+      case 'error':
+        return 'orange';
+      case 'warning':
+        return 'yellow';
+      default:
+        return 'gray';
+    }
+  }
+
+  /// Get full error information formatted for display
+  ///
+  /// Example:
+  /// ```dart
+  /// String info = PolarityErrors.getFullErrorInfo(250);
+  /// // Returns:
+  /// // "Source: LDU_MOTOR
+  /// //  Error: Motor phase overcurrent detected
+  /// //  Severity: critical
+  /// //  Action: Motor will shut down immediately"
+  /// ```
+  static String getFullErrorInfo(int errorCode) {
+    if (!isValid(errorCode)) {
+      return 'Unknown error code: $errorCode';
+    }
+
+    final source = getSource(errorCode);
+    final description = getDescription(errorCode);
+    final severity = getSeverity(errorCode);
+    final action = getAction(errorCode);
+
+    return 'Source: $source\n'
+        'Error: $description\n'
+        'Severity: $severity\n'
+        'Action: $action';
   }
 }

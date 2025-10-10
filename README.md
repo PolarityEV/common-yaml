@@ -145,13 +145,85 @@ legacy_mapping:
 
 ## Error Code Ranges
 
-| Range     | Category     | Description                    |
-|-----------|--------------|--------------------------------|
-| 100-109   | I2C          | I2C communication errors       |
-| 110-139   | CAN          | CAN bus communication errors   |
-| 140-159   | TIM          | Timer peripheral errors        |
-| 160-169   | UART         | UART serial communication      |
-| 200-249   | VCU_GENERAL  | VCU general system errors      |
+| Range     | Category     | Source          | Description                    |
+|-----------|--------------|-----------------|--------------------------------|
+| 100-109   | I2C          | STM32_VCU       | I2C communication errors       |
+| 110-139   | CAN          | STM32_VCU       | CAN bus communication errors   |
+| 140-159   | TIM          | STM32_VCU       | Timer peripheral errors        |
+| 160-169   | UART         | STM32_VCU       | UART serial communication      |
+| 200-249   | VCU_GENERAL  | STM32_VCU       | VCU general system errors      |
+| **250-299**   | **MOTOR_LDU**    | **LDU_MOTOR**       | **Motor controller errors (stm32-sine)** |
+
+## Motor/LDU Error Details
+
+**Source**: stm32-sine motor controller firmware (temporary)
+**CAN Broadcast**: ID 0x108 (10 Hz)
+**Integration**: VCU receives via CAN1, exposes via I2C 0x0B
+
+Motor errors originate from the Tesla LDU (Large Drive Unit) running stm32-sine firmware. These errors are broadcast over CAN and relayed through the VCU to the ESP32 and ultimately the Flutter mobile app.
+
+### Error Flow
+
+```
+LDU Motor → CAN 0x108 → STM32 VCU → I2C 0x0B → ESP32 → BLE → Flutter App
+```
+
+### Motor Error Types
+
+Motor errors are classified by their severity type from stm32-sine:
+
+- **ERROR_STOP** (Critical): Motor shuts down immediately
+  - Examples: Overcurrent (250), Emergency stop (254), Desaturation (256)
+
+- **ERROR_DERATE** (Warning): Motor power limited to prevent damage
+  - Examples: Heatsink overtemp (260), Current limit (261), Motor overtemp (267)
+
+- **ERROR_DISPLAY** (Info): Informational, motor continues operation
+  - Examples: Throttle sensor fault (251), Encoder warning (258)
+
+### Using Motor Errors in Flutter
+
+```dart
+import 'package:your_app/polarity_errors.dart';
+
+// Example: Display motor error with source and action
+int errorCode = 250; // MOTOR_OVERCURRENT
+
+String source = PolarityErrors.getSource(errorCode);
+// "LDU_MOTOR"
+
+String description = PolarityErrors.getDescription(errorCode);
+// "Motor phase overcurrent detected"
+
+String action = PolarityErrors.getAction(errorCode);
+// "Motor will shut down immediately"
+
+String severity = PolarityErrors.getSeverity(errorCode);
+// "critical"
+
+// Full UI display
+showErrorDialog(
+  title: '[$source] Error $errorCode',
+  message: description,
+  action: action,
+  icon: PolarityErrors.getSeverityIcon(errorCode),  // 'error'
+  color: PolarityErrors.getSeverityColor(errorCode), // 'red'
+);
+
+// Or use the combined helper:
+String fullInfo = PolarityErrors.getFullErrorInfo(errorCode);
+// Returns formatted multi-line string with all info
+```
+
+### Source Identification
+
+The app can now distinguish error origins for context-aware handling:
+
+- **STM32_VCU**: VCU firmware errors (100-249)
+- **LDU_MOTOR**: Motor controller errors (250-269)
+- **ESP32_GATEWAY**: ESP32 errors (future: 300+)
+
+This enables targeted diagnostics and user guidance based on the error source.
 
 ## Severity Levels
 

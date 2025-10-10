@@ -4,13 +4,29 @@
 
 project_name: "Polarity"
 prefix: "POLARITY_ERR"
-version: "1.0.0"
+version: "1.1.0"
 
-# VCU Error Codes: 100-254
+# Error Source Tracking (for app team visibility)
+sources:
+  - id: "STM32_VCU"
+    description: "STM32 Vehicle Control Unit"
+    location: "Main VCU firmware"
+
+  - id: "LDU_MOTOR"
+    description: "Large Drive Unit Motor Controller"
+    location: "stm32-sine firmware (temporary)"
+    note: "Will be replaced by STM32-HAL-LDU in future"
+
+  - id: "ESP32_GATEWAY"
+    description: "ESP32 BLE Gateway"
+    location: "ESP32 VCU Bridge firmware"
+
+# VCU Error Codes: 100-299
 categories:
   I2C:
     range: [100, 109]
     description: "I2C communication errors"
+    source: "STM32_VCU"
     errors:
       - name: "I2C_SLAVE_TX"
         code: 100
@@ -50,6 +66,7 @@ categories:
   CAN:
     range: [110, 139]
     description: "CAN bus communication errors"
+    source: "STM32_VCU"
     errors:
       - name: "CAN1_INIT"
         code: 110
@@ -134,6 +151,7 @@ categories:
   TIM:
     range: [140, 159]
     description: "Timer peripheral errors"
+    source: "STM32_VCU"
     errors:
       - name: "TIM1"
         code: 140
@@ -203,6 +221,7 @@ categories:
   UART:
     range: [160, 169]
     description: "UART serial communication errors"
+    source: "STM32_VCU"
     errors:
       - name: "UART1"
         code: 160
@@ -217,6 +236,7 @@ categories:
   VCU_GENERAL:
     range: [200, 249]
     description: "VCU general system errors"
+    source: "STM32_VCU"
     errors:
       - name: "VCU_INIT"
         code: 200
@@ -237,6 +257,192 @@ categories:
         code: 212
         description: "BMS2 communication or fault"
         severity: "critical"
+
+  MOTOR_LDU:
+    range: [250, 299]
+    description: "Motor controller and LDU errors"
+    source: "LDU_MOTOR"
+    can_id: "0x108"
+    errors:
+      - name: "MOTOR_OVERCURRENT"
+        code: 250
+        description: "Motor phase overcurrent detected"
+        severity: "critical"
+        sine_error_code: 1
+        sine_error_name: "ERR_OVERCURRENT"
+        sine_error_type: "ERROR_STOP"
+        action: "Motor will shut down immediately"
+
+      - name: "MOTOR_THROTTLE1"
+        code: 251
+        description: "Throttle sensor 1 fault"
+        severity: "warning"
+        sine_error_code: 2
+        sine_error_name: "ERR_THROTTLE1"
+        sine_error_type: "ERROR_DISPLAY"
+        action: "Check throttle pedal wiring"
+
+      - name: "MOTOR_THROTTLE2"
+        code: 252
+        description: "Throttle sensor 2 fault"
+        severity: "warning"
+        sine_error_code: 3
+        sine_error_name: "ERR_THROTTLE2"
+        sine_error_type: "ERROR_DISPLAY"
+        action: "Check throttle pedal wiring"
+
+      - name: "MOTOR_CANTIMEOUT"
+        code: 253
+        description: "Motor CAN communication timeout"
+        severity: "critical"
+        sine_error_code: 4
+        sine_error_name: "ERR_CANTIMEOUT"
+        sine_error_type: "ERROR_STOP"
+        action: "Check CAN bus connections"
+
+      - name: "MOTOR_EMCYSTOP"
+        code: 254
+        description: "Emergency stop triggered"
+        severity: "critical"
+        sine_error_code: 5
+        sine_error_name: "ERR_EMCYSTOP"
+        sine_error_type: "ERROR_STOP"
+        action: "Check emergency stop circuit"
+
+      - name: "MOTOR_MPROT"
+        code: 255
+        description: "Motor protection fault"
+        severity: "critical"
+        sine_error_code: 6
+        sine_error_name: "ERR_MPROT"
+        sine_error_type: "ERROR_STOP"
+        action: "Motor protection triggered"
+
+      - name: "MOTOR_DESAT"
+        code: 256
+        description: "Desaturation fault"
+        severity: "critical"
+        sine_error_code: 7
+        sine_error_name: "ERR_DESAT"
+        sine_error_type: "ERROR_STOP"
+        action: "IGBT desaturation detected"
+
+      - name: "MOTOR_OVERVOLTAGE"
+        code: 257
+        description: "DC bus overvoltage"
+        severity: "critical"
+        sine_error_code: 8
+        sine_error_name: "ERR_OVERVOLTAGE"
+        sine_error_type: "ERROR_STOP"
+        action: "DC bus voltage too high"
+
+      - name: "MOTOR_ENCODER"
+        code: 258
+        description: "Encoder failure"
+        severity: "warning"
+        sine_error_code: 9
+        sine_error_name: "ERR_ENCODER"
+        sine_error_type: "ERROR_DISPLAY"
+        action: "Check encoder connections"
+
+      - name: "MOTOR_PRECHARGE"
+        code: 259
+        description: "Precharge fault"
+        severity: "critical"
+        sine_error_code: 10
+        sine_error_name: "ERR_PRECHARGE"
+        sine_error_type: "ERROR_STOP"
+        action: "Precharge circuit failed"
+
+      - name: "MOTOR_TMPHSMAX"
+        code: 260
+        description: "Heatsink overtemperature"
+        severity: "warning"
+        sine_error_code: 11
+        sine_error_name: "ERR_TMPHSMAX"
+        sine_error_type: "ERROR_DERATE"
+        action: "Motor will derate power"
+
+      - name: "MOTOR_CURRENTLIMIT"
+        code: 261
+        description: "Current limit active"
+        severity: "warning"
+        sine_error_code: 12
+        sine_error_name: "ERR_CURRENTLIMIT"
+        sine_error_type: "ERROR_DERATE"
+        action: "Motor power limited"
+
+      - name: "MOTOR_PWMSTUCK"
+        code: 262
+        description: "PWM stuck fault"
+        severity: "warning"
+        sine_error_code: 13
+        sine_error_name: "ERR_PWMSTUCK"
+        sine_error_type: "ERROR_DISPLAY"
+        action: "PWM output failure"
+
+      - name: "MOTOR_HICUROFS1"
+        code: 263
+        description: "Current sensor 1 offset high"
+        severity: "warning"
+        sine_error_code: 14
+        sine_error_name: "ERR_HICUROFS1"
+        sine_error_type: "ERROR_DISPLAY"
+        action: "Calibrate current sensor 1"
+
+      - name: "MOTOR_HICUROFS2"
+        code: 264
+        description: "Current sensor 2 offset high"
+        severity: "warning"
+        sine_error_code: 15
+        sine_error_name: "ERR_HICUROFS2"
+        sine_error_type: "ERROR_DISPLAY"
+        action: "Calibrate current sensor 2"
+
+      - name: "MOTOR_HIRESOFS"
+        code: 265
+        description: "High-res encoder offset fault"
+        severity: "warning"
+        sine_error_code: 16
+        sine_error_name: "ERR_HIRESOFS"
+        sine_error_type: "ERROR_DISPLAY"
+        action: "Calibrate high-res encoder"
+
+      - name: "MOTOR_LORESAMP"
+        code: 266
+        description: "Low-res encoder amplitude fault"
+        severity: "warning"
+        sine_error_code: 17
+        sine_error_name: "ERR_LORESAMP"
+        sine_error_type: "ERROR_DISPLAY"
+        action: "Check encoder signal quality"
+
+      - name: "MOTOR_TMPMMAX"
+        code: 267
+        description: "Motor overtemperature"
+        severity: "warning"
+        sine_error_code: 18
+        sine_error_name: "ERR_TMPMMAX"
+        sine_error_type: "ERROR_DERATE"
+        action: "Motor will derate power"
+
+      - name: "MOTOR_CANCRC"
+        code: 268
+        description: "Motor CAN CRC error"
+        severity: "critical"
+        sine_error_code: 19
+        sine_error_name: "ERR_CANCRC"
+        sine_error_type: "ERROR_STOP"
+        action: "CAN message corrupted"
+
+      - name: "MOTOR_CANCOUNTER"
+        code: 269
+        description: "Motor CAN counter mismatch"
+        severity: "critical"
+        sine_error_code: 20
+        sine_error_name: "ERR_CANCOUNTER"
+        sine_error_type: "ERROR_STOP"
+        action: "CAN message sequence error"
 
 # Backward compatibility mapping (old names -> new names)
 # This maintains compatibility with existing code during transition
