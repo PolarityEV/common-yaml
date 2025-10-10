@@ -36,7 +36,7 @@ extern "C" {
  */
 {% for error in category_data.errors %}
 /** {{ error.description }} */
-#define {{ prefix }}_{{ error.name }}{{ ' ' * (30 - (prefix|length + error.name|length)) }}({{ error.code }})
+#define {{ prefix }}_{{ error.name }} {{ error.code }}
 {% endfor %}
 /** @} */
 
