@@ -148,6 +148,36 @@ categories:
         description: "CAN message queue overflow (messages dropped)"
         severity: "warning"
 
+      - name: "CAN1_RX_MSG"
+        code: 134
+        description: "CAN1 receive message failed"
+        severity: "error"
+
+      - name: "CAN2_RX_MSG"
+        code: 135
+        description: "CAN2 receive message failed"
+        severity: "error"
+
+      - name: "CAN3_RX_MSG"
+        code: 136
+        description: "CAN3 receive message failed"
+        severity: "error"
+
+      - name: "CAN4_RX_MSG"
+        code: 137
+        description: "CAN4 receive message failed (reserved for future hardware)"
+        severity: "error"
+
+      - name: "CAN5_RX_MSG"
+        code: 138
+        description: "CAN5 receive message failed (reserved for future hardware)"
+        severity: "error"
+
+      - name: "CAN_RESERVED"
+        code: 139
+        description: "Reserved for future CAN errors"
+        severity: "info"
+
   TIM:
     range: [140, 159]
     description: "Timer peripheral errors"
@@ -470,6 +500,11 @@ legacy_mapping:
   SKUDAK_ERR_CAN_RX_FIFO1: POLARITY_ERR_CAN_RX_FIFO1
   SKUDAK_ERR_CAN_RX_MSG: POLARITY_ERR_CAN_RX_MSG
   SKUDAK_ERR_CAN_QUEUE_FULL: POLARITY_ERR_CAN_QUEUE_FULL
+  SKUDAK_ERR_CAN1_RX_MSG: POLARITY_ERR_CAN1_RX_MSG
+  SKUDAK_ERR_CAN2_RX_MSG: POLARITY_ERR_CAN2_RX_MSG
+  SKUDAK_ERR_CAN3_RX_MSG: POLARITY_ERR_CAN3_RX_MSG
+  SKUDAK_ERR_CAN4_RX_MSG: POLARITY_ERR_CAN4_RX_MSG
+  SKUDAK_ERR_CAN5_RX_MSG: POLARITY_ERR_CAN5_RX_MSG
   SKUDAK_ERR_TIM1: POLARITY_ERR_TIM1
   SKUDAK_ERR_TIM2: POLARITY_ERR_TIM2
   SKUDAK_ERR_TIM3: POLARITY_ERR_TIM3
