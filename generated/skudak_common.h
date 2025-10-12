@@ -2,8 +2,8 @@
  * @file skudak_common.h
  * @author Bastian de Byl (bastian@polarity.com)
  * @brief I2C protocol constants for VCU communication
- * @version 1.1.0
- * @date 2025-10-09
+ * @version 1.2.0
+ * @date 2025-10-11
  *
  * @copyright Copyright (c) 2025 Polarity EV
  *
@@ -38,6 +38,7 @@
 #define VCU_I2C_BMS_SUMMARY            (0x08)  ///< BMS voltage summary (10 bytes: min, max, delta, sum voltages)
 #define VCU_I2C_SYSTEM_STATUS          (0x09)  ///< System status (8 bytes: VCU state, BMS state, ignition, charging, run, RPM)
 #define VCU_I2C_LDU_EXT                (0x0A)  ///< Extended LDU info (4 bytes: heatsink temp, water pump duty)
+#define VCU_I2C_VW_BMS_DEBUG           (0x0B)  ///< VW BMS diagnostics (12 bytes: CAN RX count, cell update count, temp update count)
 
 /**
  * For VCU error codes, include polarity_errors.h:
