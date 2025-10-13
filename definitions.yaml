@@ -474,13 +474,28 @@ categories:
         description: "Charger 4 DCDC hardware fault [Reserved]"
         severity: "error"
 
+      - name: "CHARGER_IGNITION_ON"
+        code: "0x0056"
+        description: "Charging blocked: ignition ON (vehicle operational)"
+        severity: "critical"
+
+      - name: "CHARGER_NOT_NEUTRAL"
+        code: "0x0057"
+        description: "Charging blocked: transmission not in neutral"
+        severity: "critical"
+
+      - name: "CHARGER_VEHICLE_MOVING"
+        code: "0x0058"
+        description: "Charging blocked: vehicle moving (RPM detected)"
+        severity: "critical"
+
   MOTOR_LDU:
     description: "Motor controller and LDU errors"
     source: "LDU_MOTOR"
     can_id: "0x108"
     errors:
       - name: "MOTOR_OVERCURRENT"
-        code: "0x0056"
+        code: "0x0059"
         description: "Motor phase overcurrent detected"
         severity: "critical"
         sine_error_code: 1
@@ -489,7 +504,7 @@ categories:
         action: "Motor will shut down immediately"
 
       - name: "MOTOR_THROTTLE1"
-        code: "0x0057"
+        code: "0x005A"
         description: "Throttle sensor 1 fault"
         severity: "warning"
         sine_error_code: 2
@@ -498,7 +513,7 @@ categories:
         action: "Check throttle pedal wiring"
 
       - name: "MOTOR_THROTTLE2"
-        code: "0x0058"
+        code: "0x005B"
         description: "Throttle sensor 2 fault"
         severity: "warning"
         sine_error_code: 3
@@ -507,7 +522,7 @@ categories:
         action: "Check throttle pedal wiring"
 
       - name: "MOTOR_CANTIMEOUT"
-        code: "0x0059"
+        code: "0x005C"
         description: "Motor CAN communication timeout"
         severity: "critical"
         sine_error_code: 4
@@ -516,7 +531,7 @@ categories:
         action: "Check CAN bus connections"
 
       - name: "MOTOR_EMCYSTOP"
-        code: "0x005A"
+        code: "0x005D"
         description: "Emergency stop triggered"
         severity: "critical"
         sine_error_code: 5
@@ -525,7 +540,7 @@ categories:
         action: "Check emergency stop circuit"
 
       - name: "MOTOR_MPROT"
-        code: "0x005B"
+        code: "0x005E"
         description: "Motor protection fault"
         severity: "critical"
         sine_error_code: 6
@@ -534,7 +549,7 @@ categories:
         action: "Motor protection triggered"
 
       - name: "MOTOR_DESAT"
-        code: "0x005C"
+        code: "0x005F"
         description: "Desaturation fault"
         severity: "critical"
         sine_error_code: 7
@@ -543,7 +558,7 @@ categories:
         action: "IGBT desaturation detected"
 
       - name: "MOTOR_OVERVOLTAGE"
-        code: "0x005D"
+        code: "0x0060"
         description: "DC bus overvoltage"
         severity: "critical"
         sine_error_code: 8
@@ -552,7 +567,7 @@ categories:
         action: "DC bus voltage too high"
 
       - name: "MOTOR_ENCODER"
-        code: "0x005E"
+        code: "0x0061"
         description: "Encoder failure"
         severity: "warning"
         sine_error_code: 9
@@ -561,7 +576,7 @@ categories:
         action: "Check encoder connections"
 
       - name: "MOTOR_PRECHARGE"
-        code: "0x005F"
+        code: "0x0062"
         description: "Precharge fault"
         severity: "critical"
         sine_error_code: 10
@@ -570,7 +585,7 @@ categories:
         action: "Precharge circuit failed"
 
       - name: "MOTOR_TMPHSMAX"
-        code: "0x0060"
+        code: "0x0063"
         description: "Heatsink overtemperature"
         severity: "warning"
         sine_error_code: 11
@@ -579,7 +594,7 @@ categories:
         action: "Motor will derate power"
 
       - name: "MOTOR_CURRENTLIMIT"
-        code: "0x0061"
+        code: "0x0064"
         description: "Current limit active"
         severity: "warning"
         sine_error_code: 12
@@ -588,7 +603,7 @@ categories:
         action: "Motor power limited"
 
       - name: "MOTOR_PWMSTUCK"
-        code: "0x0062"
+        code: "0x0065"
         description: "PWM stuck fault"
         severity: "warning"
         sine_error_code: 13
@@ -597,7 +612,7 @@ categories:
         action: "PWM output failure"
 
       - name: "MOTOR_HICUROFS1"
-        code: "0x0063"
+        code: "0x0066"
         description: "Current sensor 1 offset high"
         severity: "warning"
         sine_error_code: 14
@@ -606,7 +621,7 @@ categories:
         action: "Calibrate current sensor 1"
 
       - name: "MOTOR_HICUROFS2"
-        code: "0x0064"
+        code: "0x0067"
         description: "Current sensor 2 offset high"
         severity: "warning"
         sine_error_code: 15
@@ -615,7 +630,7 @@ categories:
         action: "Calibrate current sensor 2"
 
       - name: "MOTOR_HIRESOFS"
-        code: "0x0065"
+        code: "0x0068"
         description: "High-res encoder offset fault"
         severity: "warning"
         sine_error_code: 16
@@ -624,7 +639,7 @@ categories:
         action: "Calibrate high-res encoder"
 
       - name: "MOTOR_LORESAMP"
-        code: "0x0066"
+        code: "0x0069"
         description: "Low-res encoder amplitude fault"
         severity: "warning"
         sine_error_code: 17
@@ -633,7 +648,7 @@ categories:
         action: "Check encoder signal quality"
 
       - name: "MOTOR_TMPMMAX"
-        code: "0x0067"
+        code: "0x006A"
         description: "Motor overtemperature"
         severity: "warning"
         sine_error_code: 18
@@ -642,7 +657,7 @@ categories:
         action: "Motor will derate power"
 
       - name: "MOTOR_CANCRC"
-        code: "0x0068"
+        code: "0x006B"
         description: "Motor CAN CRC error"
         severity: "critical"
         sine_error_code: 19
@@ -651,7 +666,7 @@ categories:
         action: "CAN message corrupted"
 
       - name: "MOTOR_CANCOUNTER"
-        code: "0x0069"
+        code: "0x006C"
         description: "Motor CAN counter mismatch"
         severity: "critical"
         sine_error_code: 20
