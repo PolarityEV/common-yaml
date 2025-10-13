@@ -33,7 +33,7 @@ class PolarityErrors {
 
 {% endif %}
   /// {{ error.description }}
-  static const int {{ error.dart_name }} = {{ error.code }};
+  static const int {{ error.dart_name }} = {{ error.code_hex }};
 {% endfor %}
   // ========================================================================
   // Error Descriptions
@@ -42,21 +42,21 @@ class PolarityErrors {
   /// Map of error codes to human-readable descriptions
   static const Map<int, String> descriptions = {
 {% for error in all_errors %}
-    {{ error.code }}: '{{ error.description }}',
+    {{ error.code_hex }}: '{{ error.description }}',
 {% endfor %}
   };
 
   /// Map of error codes to severity levels
   static const Map<int, String> severities = {
 {% for error in all_errors %}
-    {{ error.code }}: '{{ error.severity }}',
+    {{ error.code_hex }}: '{{ error.severity }}',
 {% endfor %}
   };
 
   /// Map of error codes to category names
   static const Map<int, String> categories = {
 {% for error in all_errors %}
-    {{ error.code }}: '{{ error.category }}',
+    {{ error.code_hex }}: '{{ error.category }}',
 {% endfor %}
   };
 
@@ -64,7 +64,7 @@ class PolarityErrors {
   static const Map<int, String> sources = {
 {% for error in all_errors %}
 {% if error.source %}
-    {{ error.code }}: '{{ error.source }}',
+    {{ error.code_hex }}: '{{ error.source }}',
 {% endif %}
 {% endfor %}
   };
@@ -73,7 +73,7 @@ class PolarityErrors {
   static const Map<int, String> actions = {
 {% for error in all_errors %}
 {% if error.action %}
-    {{ error.code }}: '{{ error.action }}',
+    {{ error.code_hex }}: '{{ error.action }}',
 {% endif %}
 {% endfor %}
   };

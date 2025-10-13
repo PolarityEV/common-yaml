@@ -1,10 +1,14 @@
 # Polarity Error Code Definitions
 # Single source of truth for error codes across all platforms
 # Supports: C (STM32), C (ESP32), Dart (Flutter)
+#
+# Version 2.0.0 - 16-bit Error Code System
+# Error codes are now 16-bit (0x0000-0xFFFF) with hexadecimal format
+# BREAKING CHANGE: All error codes renumbered sequentially from 0x0001
 
 project_name: "Polarity"
 prefix: "POLARITY_ERR"
-version: "1.1.0"
+version: "2.0.0"
 
 # Error Source Tracking (for app team visibility)
 sources:
@@ -21,466 +25,462 @@ sources:
     description: "ESP32 BLE Gateway"
     location: "ESP32 VCU Bridge firmware"
 
-# VCU Error Codes: 100-299
+# Error codes are now 16-bit with sequential numbering
+# Format: Explicit hexadecimal strings (e.g., "0x0001")
+# Range: 0x0000-0xFFFF (0-65535)
 categories:
   I2C:
-    range: [100, 109]
     description: "I2C communication errors"
     source: "STM32_VCU"
     errors:
       - name: "I2C_SLAVE_TX"
-        code: 100
+        code: "0x0001"
         description: "I2C slave transmit failed"
         severity: "error"
 
       - name: "I2C_SLAVE_RX"
-        code: 101
+        code: "0x0002"
         description: "I2C slave receive failed"
         severity: "error"
 
       - name: "I2C_LISTEN"
-        code: 102
+        code: "0x0003"
         description: "I2C listen mode activation failed"
         severity: "critical"
 
       - name: "I2C_ERR_CBK"
-        code: 103
+        code: "0x0004"
         description: "I2C error callback triggered"
         severity: "error"
 
       - name: "I2C_SLAVE_TX_CPLT"
-        code: 104
+        code: "0x0005"
         description: "I2C slave transmit complete with error"
         severity: "error"
 
       - name: "I2C_SLAVE_RX_CPLT"
-        code: 105
+        code: "0x0006"
         description: "I2C slave receive complete with error"
         severity: "error"
 
       - name: "I2C_ENABLE"
-        code: 109
+        code: "0x0007"
         description: "I2C enable failed"
         severity: "critical"
 
   CAN:
-    range: [110, 139]
     description: "CAN bus communication errors"
     source: "STM32_VCU"
     errors:
       - name: "CAN1_INIT"
-        code: 110
+        code: "0x0008"
         description: "CAN1 initialization failed"
         severity: "critical"
 
       - name: "CAN2_INIT"
-        code: 111
+        code: "0x0009"
         description: "CAN2 initialization failed"
         severity: "critical"
 
       - name: "CAN3_INIT"
-        code: 112
+        code: "0x000A"
         description: "CAN3 initialization failed"
         severity: "critical"
 
       - name: "CAN1_FILTER"
-        code: 113
+        code: "0x000B"
         description: "CAN1 filter configuration failed"
         severity: "error"
 
       - name: "CAN2_FILTER"
-        code: 114
+        code: "0x000C"
         description: "CAN2 filter configuration failed"
         severity: "error"
 
       - name: "CAN3_FILTER"
-        code: 115
+        code: "0x000D"
         description: "CAN3 filter configuration failed"
         severity: "error"
 
       - name: "CAN1_EN"
-        code: 116
+        code: "0x000E"
         description: "CAN1 enable/start failed"
         severity: "critical"
 
       - name: "CAN2_EN"
-        code: 117
+        code: "0x000F"
         description: "CAN2 enable/start failed"
         severity: "critical"
 
       - name: "CAN3_EN"
-        code: 118
+        code: "0x0010"
         description: "CAN3 enable/start failed"
         severity: "critical"
 
       - name: "CAN1_NOTIFICATION"
-        code: 119
+        code: "0x0011"
         description: "CAN1 notification activation failed"
         severity: "error"
 
       - name: "CAN2_NOTIFICATION"
-        code: 120
+        code: "0x0012"
         description: "CAN2 notification activation failed"
         severity: "error"
 
       - name: "CAN3_NOTIFICATION"
-        code: 121
+        code: "0x0013"
         description: "CAN3 notification activation failed"
         severity: "error"
 
       - name: "CAN_RX_FIFO0"
-        code: 130
+        code: "0x0014"
         description: "CAN RX FIFO0 error"
         severity: "warning"
 
       - name: "CAN_RX_FIFO1"
-        code: 131
+        code: "0x0015"
         description: "CAN RX FIFO1 error"
         severity: "warning"
 
       - name: "CAN_RX_MSG"
-        code: 132
+        code: "0x0016"
         description: "CAN receive message failed"
         severity: "error"
 
       - name: "CAN_QUEUE_FULL"
-        code: 133
+        code: "0x0017"
         description: "CAN message queue overflow (messages dropped)"
         severity: "error"
 
       - name: "CAN1_RX_MSG"
-        code: 134
+        code: "0x0018"
         description: "CAN1 receive message failed"
         severity: "error"
 
       - name: "CAN2_RX_MSG"
-        code: 135
+        code: "0x0019"
         description: "CAN2 receive message failed"
         severity: "error"
 
       - name: "CAN3_RX_MSG"
-        code: 136
+        code: "0x001A"
         description: "CAN3 receive message failed"
         severity: "error"
 
       - name: "CAN4_RX_MSG"
-        code: 137
+        code: "0x001B"
         description: "CAN4 receive message failed (reserved for future hardware)"
         severity: "error"
 
       - name: "CAN5_RX_MSG"
-        code: 138
+        code: "0x001C"
         description: "CAN5 receive message failed (reserved for future hardware)"
         severity: "error"
 
       - name: "CAN_RESERVED"
-        code: 139
+        code: "0x001D"
         description: "Reserved for future CAN errors"
         severity: "info"
 
   TIM:
-    range: [140, 159]
     description: "Timer peripheral errors"
     source: "STM32_VCU"
     errors:
       - name: "TIM1"
-        code: 140
+        code: "0x001E"
         description: "Timer 1 operation failed"
         severity: "error"
 
       - name: "TIM2"
-        code: 141
+        code: "0x001F"
         description: "Timer 2 operation failed"
         severity: "error"
 
       - name: "TIM3"
-        code: 142
+        code: "0x0020"
         description: "Timer 3 operation failed"
         severity: "error"
 
       - name: "TIM4"
-        code: 143
+        code: "0x0021"
         description: "Timer 4 operation failed"
         severity: "error"
 
       - name: "TIM5"
-        code: 144
+        code: "0x0022"
         description: "Timer 5 operation failed"
         severity: "error"
 
       - name: "TIM6"
-        code: 145
+        code: "0x0023"
         description: "Timer 6 operation failed"
         severity: "error"
 
       - name: "TIM7"
-        code: 146
+        code: "0x0024"
         description: "Timer 7 operation failed"
         severity: "error"
 
       - name: "TIM8"
-        code: 147
+        code: "0x0025"
         description: "Timer 8 operation failed"
         severity: "error"
 
       - name: "TIM9"
-        code: 148
+        code: "0x0026"
         description: "Timer 9 operation failed"
         severity: "error"
 
       - name: "TIM10"
-        code: 149
+        code: "0x0027"
         description: "Timer 10 operation failed"
         severity: "error"
 
       - name: "TIM11"
-        code: 150
+        code: "0x0028"
         description: "Timer 11 operation failed"
         severity: "error"
 
       - name: "TIM12"
-        code: 151
+        code: "0x0029"
         description: "Timer 12 operation failed"
         severity: "error"
 
       - name: "TIM13"
-        code: 152
+        code: "0x002A"
         description: "Timer 13 operation failed"
         severity: "error"
 
   UART:
-    range: [160, 169]
     description: "UART serial communication errors"
     source: "STM32_VCU"
     errors:
       - name: "UART1"
-        code: 160
+        code: "0x002B"
         description: "UART1 operation failed"
         severity: "error"
 
       - name: "UART2"
-        code: 161
+        code: "0x002C"
         description: "UART2 operation failed"
         severity: "error"
 
   VCU_GENERAL:
-    range: [200, 249]
     description: "VCU general system errors"
     source: "STM32_VCU"
     errors:
       - name: "VCU_INIT"
-        code: 200
+        code: "0x002D"
         description: "VCU initialization failed"
         severity: "critical"
 
-      - name: "DCDC"
-        code: 210
-        description: "DC-DC converter error"
-        severity: "critical"
-
-      - name: "BMS1"
-        code: 211
-        description: "BMS1 communication or fault"
-        severity: "critical"
-
-      - name: "BMS2"
-        code: 212
-        description: "BMS2 communication or fault"
-        severity: "critical"
-
       - name: "FREERTOS_TASK_CREATE"
-        code: 201
+        code: "0x002E"
         description: "FreeRTOS task creation failed (insufficient heap memory)"
         severity: "critical"
 
       - name: "MEMORY_ALLOC"
-        code: 202
+        code: "0x002F"
         description: "Memory allocation failed (malloc returned NULL)"
         severity: "critical"
 
-      - name: "BMS2_OVERVOLTAGE"
-        code: 213
-        description: "BMS2 cell overvoltage detected (charging stopped)"
+      - name: "DCDC"
+        code: "0x0030"
+        description: "DC-DC converter error"
         severity: "critical"
 
-      - name: "BMS2_UNDERVOLTAGE"
-        code: 214
-        description: "BMS2 cell undervoltage detected (fault condition)"
+      - name: "BMS1"
+        code: "0x0031"
+        description: "BMS1 communication or fault"
         severity: "critical"
 
-      - name: "BMS2_EXCESSIVE_DELTA"
-        code: 215
-        description: "BMS2 cell voltage imbalance exceeds limit"
-        severity: "warning"
-
-      - name: "BMS2_DATA_FAULT"
-        code: 216
-        description: "BMS2 data invalid or corrupted (all cells zero)"
-        severity: "critical"
-
-      - name: "BMS2_TIMEOUT"
-        code: 217
-        description: "BMS2 communication timeout (no response to wake-up signals)"
-        severity: "error"
-
-      - name: "BMS3_OVERVOLTAGE"
-        code: 218
-        description: "BMS3 cell overvoltage detected (charging stopped)"
+      - name: "BMS2"
+        code: "0x0032"
+        description: "BMS2 communication or fault"
         severity: "critical"
 
       - name: "BMS1_OVERVOLTAGE"
-        code: 220
+        code: "0x0033"
         description: "BMS1 cell overvoltage detected (charging stopped)"
         severity: "critical"
 
       - name: "BMS1_UNDERVOLTAGE"
-        code: 221
+        code: "0x0034"
         description: "BMS1 cell undervoltage detected (fault condition)"
         severity: "critical"
 
       - name: "BMS1_EXCESSIVE_DELTA"
-        code: 222
+        code: "0x0035"
         description: "BMS1 cell voltage imbalance exceeds limit"
         severity: "warning"
 
       - name: "BMS1_DATA_FAULT"
-        code: 223
+        code: "0x0036"
         description: "BMS1 data invalid or corrupted (all cells zero)"
         severity: "critical"
 
       - name: "BMS1_TIMEOUT"
-        code: 224
+        code: "0x0037"
         description: "BMS1 communication timeout (no response to wake-up signals)"
         severity: "error"
 
+      - name: "BMS2_OVERVOLTAGE"
+        code: "0x0038"
+        description: "BMS2 cell overvoltage detected (charging stopped)"
+        severity: "critical"
+
+      - name: "BMS2_UNDERVOLTAGE"
+        code: "0x0039"
+        description: "BMS2 cell undervoltage detected (fault condition)"
+        severity: "critical"
+
+      - name: "BMS2_EXCESSIVE_DELTA"
+        code: "0x003A"
+        description: "BMS2 cell voltage imbalance exceeds limit"
+        severity: "warning"
+
+      - name: "BMS2_DATA_FAULT"
+        code: "0x003B"
+        description: "BMS2 data invalid or corrupted (all cells zero)"
+        severity: "critical"
+
+      - name: "BMS2_TIMEOUT"
+        code: "0x003C"
+        description: "BMS2 communication timeout (no response to wake-up signals)"
+        severity: "error"
+
+      - name: "BMS3_OVERVOLTAGE"
+        code: "0x003D"
+        description: "BMS3 cell overvoltage detected (charging stopped)"
+        severity: "critical"
+
       - name: "BMS3_UNDERVOLTAGE"
-        code: 225
+        code: "0x003E"
         description: "BMS3 cell undervoltage detected (fault condition)"
         severity: "critical"
 
       - name: "BMS3_EXCESSIVE_DELTA"
-        code: 226
+        code: "0x003F"
         description: "BMS3 cell voltage imbalance exceeds limit"
         severity: "warning"
 
       - name: "BMS3_DATA_FAULT"
-        code: 227
+        code: "0x0040"
         description: "BMS3 data invalid or corrupted (all cells zero)"
         severity: "critical"
 
       - name: "BMS3_TIMEOUT"
-        code: 228
+        code: "0x0041"
         description: "BMS3 communication timeout (no response to wake-up signals)"
         severity: "error"
 
       - name: "CHARGER1_OBC_TIMEOUT"
-        code: 230
+        code: "0x0042"
         description: "Charger 1 OBC communication timeout (>1s)"
         severity: "error"
 
       - name: "CHARGER1_DCDC_TIMEOUT"
-        code: 231
+        code: "0x0043"
         description: "Charger 1 DCDC communication timeout (>1s)"
         severity: "error"
 
       - name: "CHARGER1_TX_FAIL"
-        code: 232
+        code: "0x0044"
         description: "Charger 1 CAN transmission failed"
         severity: "warning"
 
       - name: "CHARGER1_OBC_FAULT"
-        code: 233
+        code: "0x0045"
         description: "Charger 1 OBC hardware or temperature fault"
         severity: "error"
 
       - name: "CHARGER1_DCDC_FAULT"
-        code: 234
+        code: "0x0046"
         description: "Charger 1 DCDC hardware fault"
         severity: "error"
 
       - name: "CHARGER2_OBC_TIMEOUT"
-        code: 235
+        code: "0x0047"
         description: "Charger 2 OBC communication timeout (>1s)"
         severity: "error"
 
       - name: "CHARGER2_DCDC_TIMEOUT"
-        code: 236
+        code: "0x0048"
         description: "Charger 2 DCDC communication timeout (>1s)"
         severity: "error"
 
       - name: "CHARGER2_TX_FAIL"
-        code: 237
+        code: "0x0049"
         description: "Charger 2 CAN transmission failed"
         severity: "warning"
 
       - name: "CHARGER2_OBC_FAULT"
-        code: 238
+        code: "0x004A"
         description: "Charger 2 OBC hardware or temperature fault"
         severity: "error"
 
       - name: "CHARGER2_DCDC_FAULT"
-        code: 239
+        code: "0x004B"
         description: "Charger 2 DCDC hardware fault"
         severity: "error"
 
       - name: "CHARGER3_OBC_TIMEOUT"
-        code: 240
+        code: "0x004C"
         description: "Charger 3 OBC communication timeout (>1s)"
         severity: "error"
 
       - name: "CHARGER3_DCDC_TIMEOUT"
-        code: 241
+        code: "0x004D"
         description: "Charger 3 DCDC communication timeout (>1s)"
         severity: "error"
 
       - name: "CHARGER3_TX_FAIL"
-        code: 242
+        code: "0x004E"
         description: "Charger 3 CAN transmission failed"
         severity: "warning"
 
       - name: "CHARGER3_OBC_FAULT"
-        code: 243
+        code: "0x004F"
         description: "Charger 3 OBC hardware or temperature fault"
         severity: "error"
 
       - name: "CHARGER3_DCDC_FAULT"
-        code: 244
+        code: "0x0050"
         description: "Charger 3 DCDC hardware fault"
         severity: "error"
 
       - name: "CHARGER4_OBC_TIMEOUT"
-        code: 245
+        code: "0x0051"
         description: "Charger 4 OBC communication timeout (>1s) [Reserved]"
         severity: "error"
 
       - name: "CHARGER4_DCDC_TIMEOUT"
-        code: 246
+        code: "0x0052"
         description: "Charger 4 DCDC communication timeout (>1s) [Reserved]"
         severity: "error"
 
       - name: "CHARGER4_TX_FAIL"
-        code: 247
+        code: "0x0053"
         description: "Charger 4 CAN transmission failed [Reserved]"
         severity: "warning"
 
       - name: "CHARGER4_OBC_FAULT"
-        code: 248
+        code: "0x0054"
         description: "Charger 4 OBC hardware or temperature fault [Reserved]"
         severity: "error"
 
       - name: "CHARGER4_DCDC_FAULT"
-        code: 249
+        code: "0x0055"
         description: "Charger 4 DCDC hardware fault [Reserved]"
         severity: "error"
 
   MOTOR_LDU:
-    range: [250, 299]
     description: "Motor controller and LDU errors"
     source: "LDU_MOTOR"
     can_id: "0x108"
     errors:
       - name: "MOTOR_OVERCURRENT"
-        code: 250
+        code: "0x0056"
         description: "Motor phase overcurrent detected"
         severity: "critical"
         sine_error_code: 1
@@ -489,7 +489,7 @@ categories:
         action: "Motor will shut down immediately"
 
       - name: "MOTOR_THROTTLE1"
-        code: 251
+        code: "0x0057"
         description: "Throttle sensor 1 fault"
         severity: "warning"
         sine_error_code: 2
@@ -498,7 +498,7 @@ categories:
         action: "Check throttle pedal wiring"
 
       - name: "MOTOR_THROTTLE2"
-        code: 252
+        code: "0x0058"
         description: "Throttle sensor 2 fault"
         severity: "warning"
         sine_error_code: 3
@@ -507,7 +507,7 @@ categories:
         action: "Check throttle pedal wiring"
 
       - name: "MOTOR_CANTIMEOUT"
-        code: 253
+        code: "0x0059"
         description: "Motor CAN communication timeout"
         severity: "critical"
         sine_error_code: 4
@@ -516,7 +516,7 @@ categories:
         action: "Check CAN bus connections"
 
       - name: "MOTOR_EMCYSTOP"
-        code: 254
+        code: "0x005A"
         description: "Emergency stop triggered"
         severity: "critical"
         sine_error_code: 5
@@ -525,7 +525,7 @@ categories:
         action: "Check emergency stop circuit"
 
       - name: "MOTOR_MPROT"
-        code: 255
+        code: "0x005B"
         description: "Motor protection fault"
         severity: "critical"
         sine_error_code: 6
@@ -534,7 +534,7 @@ categories:
         action: "Motor protection triggered"
 
       - name: "MOTOR_DESAT"
-        code: 256
+        code: "0x005C"
         description: "Desaturation fault"
         severity: "critical"
         sine_error_code: 7
@@ -543,7 +543,7 @@ categories:
         action: "IGBT desaturation detected"
 
       - name: "MOTOR_OVERVOLTAGE"
-        code: 257
+        code: "0x005D"
         description: "DC bus overvoltage"
         severity: "critical"
         sine_error_code: 8
@@ -552,7 +552,7 @@ categories:
         action: "DC bus voltage too high"
 
       - name: "MOTOR_ENCODER"
-        code: 258
+        code: "0x005E"
         description: "Encoder failure"
         severity: "warning"
         sine_error_code: 9
@@ -561,7 +561,7 @@ categories:
         action: "Check encoder connections"
 
       - name: "MOTOR_PRECHARGE"
-        code: 259
+        code: "0x005F"
         description: "Precharge fault"
         severity: "critical"
         sine_error_code: 10
@@ -570,7 +570,7 @@ categories:
         action: "Precharge circuit failed"
 
       - name: "MOTOR_TMPHSMAX"
-        code: 260
+        code: "0x0060"
         description: "Heatsink overtemperature"
         severity: "warning"
         sine_error_code: 11
@@ -579,7 +579,7 @@ categories:
         action: "Motor will derate power"
 
       - name: "MOTOR_CURRENTLIMIT"
-        code: 261
+        code: "0x0061"
         description: "Current limit active"
         severity: "warning"
         sine_error_code: 12
@@ -588,7 +588,7 @@ categories:
         action: "Motor power limited"
 
       - name: "MOTOR_PWMSTUCK"
-        code: 262
+        code: "0x0062"
         description: "PWM stuck fault"
         severity: "warning"
         sine_error_code: 13
@@ -597,7 +597,7 @@ categories:
         action: "PWM output failure"
 
       - name: "MOTOR_HICUROFS1"
-        code: 263
+        code: "0x0063"
         description: "Current sensor 1 offset high"
         severity: "warning"
         sine_error_code: 14
@@ -606,7 +606,7 @@ categories:
         action: "Calibrate current sensor 1"
 
       - name: "MOTOR_HICUROFS2"
-        code: 264
+        code: "0x0064"
         description: "Current sensor 2 offset high"
         severity: "warning"
         sine_error_code: 15
@@ -615,7 +615,7 @@ categories:
         action: "Calibrate current sensor 2"
 
       - name: "MOTOR_HIRESOFS"
-        code: 265
+        code: "0x0065"
         description: "High-res encoder offset fault"
         severity: "warning"
         sine_error_code: 16
@@ -624,7 +624,7 @@ categories:
         action: "Calibrate high-res encoder"
 
       - name: "MOTOR_LORESAMP"
-        code: 266
+        code: "0x0066"
         description: "Low-res encoder amplitude fault"
         severity: "warning"
         sine_error_code: 17
@@ -633,7 +633,7 @@ categories:
         action: "Check encoder signal quality"
 
       - name: "MOTOR_TMPMMAX"
-        code: 267
+        code: "0x0067"
         description: "Motor overtemperature"
         severity: "warning"
         sine_error_code: 18
@@ -642,7 +642,7 @@ categories:
         action: "Motor will derate power"
 
       - name: "MOTOR_CANCRC"
-        code: 268
+        code: "0x0068"
         description: "Motor CAN CRC error"
         severity: "critical"
         sine_error_code: 19
@@ -651,7 +651,7 @@ categories:
         action: "CAN message corrupted"
 
       - name: "MOTOR_CANCOUNTER"
-        code: 269
+        code: "0x0069"
         description: "Motor CAN counter mismatch"
         severity: "critical"
         sine_error_code: 20
@@ -659,53 +659,3 @@ categories:
         sine_error_type: "ERROR_STOP"
         action: "CAN message sequence error"
 
-# Backward compatibility mapping (old names -> new names)
-# This maintains compatibility with existing code during transition
-legacy_mapping:
-  SKUDAK_ERR_I2C_SLAVE_TX: POLARITY_ERR_I2C_SLAVE_TX
-  SKUDAK_ERR_I2C_SLAVE_RX: POLARITY_ERR_I2C_SLAVE_RX
-  SKUDAK_ERR_I2C_LISTEN: POLARITY_ERR_I2C_LISTEN
-  SKUDAK_ERR_I2C_ERR_CBK: POLARITY_ERR_I2C_ERR_CBK
-  SKUDAK_ERR_I2C_SLAVE_TX_CPLT: POLARITY_ERR_I2C_SLAVE_TX_CPLT
-  SKUDAK_ERR_I2C_SLAVE_RX_CPLT: POLARITY_ERR_I2C_SLAVE_RX_CPLT
-  SKUDAK_ERR_I2C_ENABLE: POLARITY_ERR_I2C_ENABLE
-  SKUDAK_ERR_CAN1_INIT: POLARITY_ERR_CAN1_INIT
-  SKUDAK_ERR_CAN2_INIT: POLARITY_ERR_CAN2_INIT
-  SKUDAK_ERR_CAN3_INIT: POLARITY_ERR_CAN3_INIT
-  SKUDAK_ERR_CAN1_FILTER: POLARITY_ERR_CAN1_FILTER
-  SKUDAK_ERR_CAN2_FILTER: POLARITY_ERR_CAN2_FILTER
-  SKUDAK_ERR_CAN3_FILTER: POLARITY_ERR_CAN3_FILTER
-  SKUDAK_ERR_CAN1_EN: POLARITY_ERR_CAN1_EN
-  SKUDAK_ERR_CAN2_EN: POLARITY_ERR_CAN2_EN
-  SKUDAK_ERR_CAN3_EN: POLARITY_ERR_CAN3_EN
-  SKUDAK_ERR_CAN1_NOTIFICATION: POLARITY_ERR_CAN1_NOTIFICATION
-  SKUDAK_ERR_CAN2_NOTIFICATION: POLARITY_ERR_CAN2_NOTIFICATION
-  SKUDAK_ERR_CAN3_NOTIFICATION: POLARITY_ERR_CAN3_NOTIFICATION
-  SKUDAK_ERR_CAN_RX_FIFO0: POLARITY_ERR_CAN_RX_FIFO0
-  SKUDAK_ERR_CAN_RX_FIFO1: POLARITY_ERR_CAN_RX_FIFO1
-  SKUDAK_ERR_CAN_RX_MSG: POLARITY_ERR_CAN_RX_MSG
-  SKUDAK_ERR_CAN_QUEUE_FULL: POLARITY_ERR_CAN_QUEUE_FULL
-  SKUDAK_ERR_CAN1_RX_MSG: POLARITY_ERR_CAN1_RX_MSG
-  SKUDAK_ERR_CAN2_RX_MSG: POLARITY_ERR_CAN2_RX_MSG
-  SKUDAK_ERR_CAN3_RX_MSG: POLARITY_ERR_CAN3_RX_MSG
-  SKUDAK_ERR_CAN4_RX_MSG: POLARITY_ERR_CAN4_RX_MSG
-  SKUDAK_ERR_CAN5_RX_MSG: POLARITY_ERR_CAN5_RX_MSG
-  SKUDAK_ERR_TIM1: POLARITY_ERR_TIM1
-  SKUDAK_ERR_TIM2: POLARITY_ERR_TIM2
-  SKUDAK_ERR_TIM3: POLARITY_ERR_TIM3
-  SKUDAK_ERR_TIM4: POLARITY_ERR_TIM4
-  SKUDAK_ERR_TIM5: POLARITY_ERR_TIM5
-  SKUDAK_ERR_TIM6: POLARITY_ERR_TIM6
-  SKUDAK_ERR_TIM7: POLARITY_ERR_TIM7
-  SKUDAK_ERR_TIM8: POLARITY_ERR_TIM8
-  SKUDAK_ERR_TIM9: POLARITY_ERR_TIM9
-  SKUDAK_ERR_TIM10: POLARITY_ERR_TIM10
-  SKUDAK_ERR_TIM11: POLARITY_ERR_TIM11
-  SKUDAK_ERR_TIM12: POLARITY_ERR_TIM12
-  SKUDAK_ERR_TIM13: POLARITY_ERR_TIM13
-  SKUDAK_ERR_UART1: POLARITY_ERR_UART1
-  SKUDAK_ERR_UART2: POLARITY_ERR_UART2
-  SKUDAK_ERR_VCU_INIT: POLARITY_ERR_VCU_INIT
-  SKUDAK_ERR_DCDC: POLARITY_ERR_DCDC
-  SKUDAK_ERR_BMS1: POLARITY_ERR_BMS1
-  SKUDAK_ERR_BMS2: POLARITY_ERR_BMS2

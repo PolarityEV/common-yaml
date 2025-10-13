@@ -34,10 +34,76 @@ def to_camel_case(snake_str):
     return components[0].lower() + ''.join(x.title() for x in components[1:])
 
 
+def parse_error_code(code_value):
+    """
+    Parse error code from YAML (hex string or integer).
+
+    Supports:
+    - Explicit hex strings: "0x0001" -> 1
+    - Decimal integers: 100 -> 100 (deprecated, raises warning)
+
+    Returns integer value suitable for C #define.
+    """
+    if isinstance(code_value, str):
+        if code_value.startswith('0x') or code_value.startswith('0X'):
+            # Parse hexadecimal string
+            try:
+                return int(code_value, 16)
+            except ValueError:
+                raise ValueError(f"Invalid hex format: {code_value}")
+        else:
+            raise ValueError(
+                f"Error code must be hex string (e.g., '0x0001'), got: {code_value}"
+            )
+    elif isinstance(code_value, int):
+        # Decimal integer (deprecated)
+        print(f"WARNING: Decimal integer {code_value} found. Use hex format: '0x{code_value:04X}'")
+        return code_value
+    else:
+        raise ValueError(f"Invalid error code type: {type(code_value)} for value {code_value}")
+
+
+def validate_error_codes(definitions):
+    """Validate error codes are within 16-bit range and unique."""
+    seen_codes = {}
+    max_code = 0
+
+    for category_name, category_data in definitions['categories'].items():
+        for error in category_data['errors']:
+            code = parse_error_code(error['code'])
+            error_name = error['name']
+
+            # Check 16-bit range
+            if code < 0 or code > 0xFFFF:
+                raise ValueError(
+                    f"Error code 0x{code:04X} for {error_name} is outside "
+                    f"16-bit range (0x0000-0xFFFF)"
+                )
+
+            # Check for duplicates
+            if code in seen_codes:
+                raise ValueError(
+                    f"Duplicate error code 0x{code:04X}: "
+                    f"{error_name} and {seen_codes[code]}"
+                )
+
+            seen_codes[code] = error_name
+            max_code = max(max_code, code)
+
+    print(f"  → Validated {len(seen_codes)} error codes")
+    print(f"  → Highest code: 0x{max_code:04X} ({max_code} decimal)")
+    print(f"  → Remaining capacity: {0xFFFF - max_code} codes")
+
+
 def load_definitions(yaml_path):
     """Load error definitions from YAML file."""
     with open(yaml_path, 'r') as f:
-        return yaml.safe_load(f)
+        definitions = yaml.safe_load(f)
+
+    # Validate error codes
+    validate_error_codes(definitions)
+
+    return definitions
 
 
 def generate_c_header(definitions, output_path, template_env):
@@ -48,11 +114,14 @@ def generate_c_header(definitions, output_path, template_env):
     all_errors = []
     for category_name, category_data in definitions['categories'].items():
         for error in category_data['errors']:
+            code_int = parse_error_code(error['code'])
             all_errors.append({
                 'category': category_name,
                 'category_desc': category_data['description'],
                 'name': error['name'],
-                'code': error['code'],
+                'code': error['code'],  # Keep original for reference
+                'code_hex': f"0x{code_int:04X}",  # Formatted hex for C
+                'code_int': code_int,  # Integer value
                 'description': error['description'],
                 'severity': error.get('severity', 'error')
             })
@@ -63,7 +132,6 @@ def generate_c_header(definitions, output_path, template_env):
         version=definitions['version'],
         categories=definitions['categories'],
         all_errors=all_errors,
-        legacy_mapping=definitions.get('legacy_mapping', {}),
         generated_date=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     )
 
@@ -82,17 +150,20 @@ def generate_dart_file(definitions, output_path, template_env):
 
     for category_name, category_data in definitions['categories'].items():
         for error in category_data['errors']:
+            code_int = parse_error_code(error['code'])
             dart_name = to_camel_case(error['name'])
             all_errors.append({
                 'category': category_name,
                 'category_desc': category_data['description'],
                 'name': error['name'],
                 'dart_name': dart_name,
-                'code': error['code'],
+                'code': error['code'],  # Keep original for reference
+                'code_hex': f"0x{code_int:04X}",  # Formatted hex for Dart
+                'code_int': code_int,  # Integer value
                 'description': error['description'],
                 'severity': error.get('severity', 'error')
             })
-            error_map[error['code']] = error['description']
+            error_map[code_int] = error['description']
 
     content = template.render(
         project_name=definitions['project_name'],

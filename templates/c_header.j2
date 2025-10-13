@@ -28,34 +28,22 @@ extern "C" {
  * @{
  */
 
-{% for category_name, category_data in categories.items() %}
+{% for error in all_errors %}
+{% if loop.first or error.category != all_errors[loop.index0 - 1].category %}
 /**
- * @name {{ category_name }} Errors ({{ category_data.range[0] }}-{{ category_data.range[1] }})
- * @brief {{ category_data.description }}
+ * @name {{ error.category }} Errors
+ * @brief {{ error.category_desc }}
  * @{
  */
-{% for error in category_data.errors %}
+{% endif %}
 /** {{ error.description }} */
-#define {{ prefix }}_{{ error.name }} {{ error.code }}
-{% endfor %}
+#define {{ prefix }}_{{ error.name }} {{ error.code_hex }}
+{% if loop.last or error.category != all_errors[loop.index0 + 1].category %}
 /** @} */
 
+{% endif %}
 {% endfor %}
 /** @} */ // End of ErrorCodes group
-
-/*
- * Backward Compatibility Aliases (DEPRECATED)
- *
- * These aliases maintain compatibility with legacy code using SKUDAK_ERR_* naming.
- * New code should use {{ prefix }}_* constants.
- *
- * These will be removed in a future version.
- */
-#ifdef POLARITY_ENABLE_LEGACY_NAMES
-{% for old_name, new_name in legacy_mapping.items() %}
-#define {{ old_name }}{{ ' ' * (40 - old_name|length) }}{{ new_name }}
-{% endfor %}
-#endif /* POLARITY_ENABLE_LEGACY_NAMES */
 
 #ifdef __cplusplus
 }
