@@ -288,6 +288,66 @@ categories:
         description: "BMS2 communication or fault"
         severity: "critical"
 
+      - name: "BMS_OVERVOLTAGE"
+        code: 220
+        description: "BMS cell overvoltage detected (charging stopped)"
+        severity: "critical"
+
+      - name: "BMS_UNDERVOLTAGE"
+        code: 221
+        description: "BMS cell undervoltage detected (fault condition)"
+        severity: "critical"
+
+      - name: "BMS_EXCESSIVE_DELTA"
+        code: 222
+        description: "BMS cell voltage imbalance exceeds limit"
+        severity: "warning"
+
+      - name: "BMS_DATA_FAULT"
+        code: 223
+        description: "BMS data invalid or corrupted (all cells zero)"
+        severity: "critical"
+
+      - name: "CHARGER1_OBC_TIMEOUT"
+        code: 230
+        description: "Charger 1 OBC communication timeout"
+        severity: "error"
+
+      - name: "CHARGER1_DCDC_TIMEOUT"
+        code: 231
+        description: "Charger 1 DCDC communication timeout"
+        severity: "warning"
+
+      - name: "CHARGER3_OBC_TIMEOUT"
+        code: 232
+        description: "Charger 3 OBC communication timeout"
+        severity: "error"
+
+      - name: "CHARGER3_DCDC_TIMEOUT"
+        code: 233
+        description: "Charger 3 DCDC communication timeout"
+        severity: "warning"
+
+      - name: "CHARGER1_TX_FAIL"
+        code: 234
+        description: "Failed to transmit command to Charger 1"
+        severity: "warning"
+
+      - name: "CHARGER3_TX_FAIL"
+        code: 235
+        description: "Failed to transmit command to Charger 3"
+        severity: "warning"
+
+      - name: "CHARGER1_OBC_FAULT"
+        code: 236
+        description: "Charger 1 OBC hardware or temperature fault"
+        severity: "error"
+
+      - name: "CHARGER3_OBC_FAULT"
+        code: 237
+        description: "Charger 3 OBC hardware or temperature fault"
+        severity: "error"
+
   MOTOR_LDU:
     range: [250, 299]
     description: "Motor controller and LDU errors"
