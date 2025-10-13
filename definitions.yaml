@@ -401,52 +401,52 @@ categories:
 
       - name: "CHARGER2_OBC_TIMEOUT"
         code: "0x0047"
-        description: "Charger 2 OBC communication timeout (>1s)"
+        description: "Charger 2 OBC communication timeout (>1s) [CAN3]"
         severity: "error"
 
       - name: "CHARGER2_DCDC_TIMEOUT"
         code: "0x0048"
-        description: "Charger 2 DCDC communication timeout (>1s)"
+        description: "Charger 2 DCDC communication timeout (>1s) [CAN3]"
         severity: "error"
 
       - name: "CHARGER2_TX_FAIL"
         code: "0x0049"
-        description: "Charger 2 CAN transmission failed"
+        description: "Charger 2 CAN transmission failed [CAN3]"
         severity: "warning"
 
       - name: "CHARGER2_OBC_FAULT"
         code: "0x004A"
-        description: "Charger 2 OBC hardware or temperature fault"
+        description: "Charger 2 OBC hardware or temperature fault [CAN3]"
         severity: "error"
 
       - name: "CHARGER2_DCDC_FAULT"
         code: "0x004B"
-        description: "Charger 2 DCDC hardware fault"
+        description: "Charger 2 DCDC hardware fault [CAN3]"
         severity: "error"
 
       - name: "CHARGER3_OBC_TIMEOUT"
         code: "0x004C"
-        description: "Charger 3 OBC communication timeout (>1s)"
+        description: "Charger 3 OBC communication timeout (>1s) [Reserved]"
         severity: "error"
 
       - name: "CHARGER3_DCDC_TIMEOUT"
         code: "0x004D"
-        description: "Charger 3 DCDC communication timeout (>1s)"
+        description: "Charger 3 DCDC communication timeout (>1s) [Reserved]"
         severity: "error"
 
       - name: "CHARGER3_TX_FAIL"
         code: "0x004E"
-        description: "Charger 3 CAN transmission failed"
+        description: "Charger 3 CAN transmission failed [Reserved]"
         severity: "warning"
 
       - name: "CHARGER3_OBC_FAULT"
         code: "0x004F"
-        description: "Charger 3 OBC hardware or temperature fault"
+        description: "Charger 3 OBC hardware or temperature fault [Reserved]"
         severity: "error"
 
       - name: "CHARGER3_DCDC_FAULT"
         code: "0x0050"
-        description: "Charger 3 DCDC hardware fault"
+        description: "Charger 3 DCDC hardware fault [Reserved]"
         severity: "error"
 
       - name: "CHARGER4_OBC_TIMEOUT"
