@@ -41,7 +41,7 @@ categories:
       - name: "I2C_LISTEN"
         code: 102
         description: "I2C listen mode activation failed"
-        severity: "error"
+        severity: "critical"
 
       - name: "I2C_ERR_CBK"
         code: 103
@@ -61,7 +61,7 @@ categories:
       - name: "I2C_ENABLE"
         code: 109
         description: "I2C enable failed"
-        severity: "error"
+        severity: "critical"
 
   CAN:
     range: [110, 139]
@@ -146,7 +146,7 @@ categories:
       - name: "CAN_QUEUE_FULL"
         code: 133
         description: "CAN message queue overflow (messages dropped)"
-        severity: "warning"
+        severity: "error"
 
       - name: "CAN1_RX_MSG"
         code: 134
@@ -288,64 +288,189 @@ categories:
         description: "BMS2 communication or fault"
         severity: "critical"
 
-      - name: "BMS_OVERVOLTAGE"
-        code: 220
-        description: "BMS cell overvoltage detected (charging stopped)"
+      - name: "FREERTOS_TASK_CREATE"
+        code: 201
+        description: "FreeRTOS task creation failed (insufficient heap memory)"
         severity: "critical"
 
-      - name: "BMS_UNDERVOLTAGE"
-        code: 221
-        description: "BMS cell undervoltage detected (fault condition)"
+      - name: "MEMORY_ALLOC"
+        code: 202
+        description: "Memory allocation failed (malloc returned NULL)"
         severity: "critical"
 
-      - name: "BMS_EXCESSIVE_DELTA"
-        code: 222
-        description: "BMS cell voltage imbalance exceeds limit"
+      - name: "BMS2_OVERVOLTAGE"
+        code: 213
+        description: "BMS2 cell overvoltage detected (charging stopped)"
+        severity: "critical"
+
+      - name: "BMS2_UNDERVOLTAGE"
+        code: 214
+        description: "BMS2 cell undervoltage detected (fault condition)"
+        severity: "critical"
+
+      - name: "BMS2_EXCESSIVE_DELTA"
+        code: 215
+        description: "BMS2 cell voltage imbalance exceeds limit"
         severity: "warning"
 
-      - name: "BMS_DATA_FAULT"
-        code: 223
-        description: "BMS data invalid or corrupted (all cells zero)"
+      - name: "BMS2_DATA_FAULT"
+        code: 216
+        description: "BMS2 data invalid or corrupted (all cells zero)"
         severity: "critical"
+
+      - name: "BMS2_TIMEOUT"
+        code: 217
+        description: "BMS2 communication timeout (no response to wake-up signals)"
+        severity: "error"
+
+      - name: "BMS3_OVERVOLTAGE"
+        code: 218
+        description: "BMS3 cell overvoltage detected (charging stopped)"
+        severity: "critical"
+
+      - name: "BMS1_OVERVOLTAGE"
+        code: 220
+        description: "BMS1 cell overvoltage detected (charging stopped)"
+        severity: "critical"
+
+      - name: "BMS1_UNDERVOLTAGE"
+        code: 221
+        description: "BMS1 cell undervoltage detected (fault condition)"
+        severity: "critical"
+
+      - name: "BMS1_EXCESSIVE_DELTA"
+        code: 222
+        description: "BMS1 cell voltage imbalance exceeds limit"
+        severity: "warning"
+
+      - name: "BMS1_DATA_FAULT"
+        code: 223
+        description: "BMS1 data invalid or corrupted (all cells zero)"
+        severity: "critical"
+
+      - name: "BMS1_TIMEOUT"
+        code: 224
+        description: "BMS1 communication timeout (no response to wake-up signals)"
+        severity: "error"
+
+      - name: "BMS3_UNDERVOLTAGE"
+        code: 225
+        description: "BMS3 cell undervoltage detected (fault condition)"
+        severity: "critical"
+
+      - name: "BMS3_EXCESSIVE_DELTA"
+        code: 226
+        description: "BMS3 cell voltage imbalance exceeds limit"
+        severity: "warning"
+
+      - name: "BMS3_DATA_FAULT"
+        code: 227
+        description: "BMS3 data invalid or corrupted (all cells zero)"
+        severity: "critical"
+
+      - name: "BMS3_TIMEOUT"
+        code: 228
+        description: "BMS3 communication timeout (no response to wake-up signals)"
+        severity: "error"
 
       - name: "CHARGER1_OBC_TIMEOUT"
         code: 230
-        description: "Charger 1 OBC communication timeout"
+        description: "Charger 1 OBC communication timeout (>1s)"
         severity: "error"
 
       - name: "CHARGER1_DCDC_TIMEOUT"
         code: 231
-        description: "Charger 1 DCDC communication timeout"
-        severity: "warning"
-
-      - name: "CHARGER3_OBC_TIMEOUT"
-        code: 232
-        description: "Charger 3 OBC communication timeout"
+        description: "Charger 1 DCDC communication timeout (>1s)"
         severity: "error"
 
-      - name: "CHARGER3_DCDC_TIMEOUT"
-        code: 233
-        description: "Charger 3 DCDC communication timeout"
-        severity: "warning"
-
       - name: "CHARGER1_TX_FAIL"
-        code: 234
-        description: "Failed to transmit command to Charger 1"
-        severity: "warning"
-
-      - name: "CHARGER3_TX_FAIL"
-        code: 235
-        description: "Failed to transmit command to Charger 3"
+        code: 232
+        description: "Charger 1 CAN transmission failed"
         severity: "warning"
 
       - name: "CHARGER1_OBC_FAULT"
-        code: 236
+        code: 233
         description: "Charger 1 OBC hardware or temperature fault"
         severity: "error"
 
-      - name: "CHARGER3_OBC_FAULT"
+      - name: "CHARGER1_DCDC_FAULT"
+        code: 234
+        description: "Charger 1 DCDC hardware fault"
+        severity: "error"
+
+      - name: "CHARGER2_OBC_TIMEOUT"
+        code: 235
+        description: "Charger 2 OBC communication timeout (>1s)"
+        severity: "error"
+
+      - name: "CHARGER2_DCDC_TIMEOUT"
+        code: 236
+        description: "Charger 2 DCDC communication timeout (>1s)"
+        severity: "error"
+
+      - name: "CHARGER2_TX_FAIL"
         code: 237
+        description: "Charger 2 CAN transmission failed"
+        severity: "warning"
+
+      - name: "CHARGER2_OBC_FAULT"
+        code: 238
+        description: "Charger 2 OBC hardware or temperature fault"
+        severity: "error"
+
+      - name: "CHARGER2_DCDC_FAULT"
+        code: 239
+        description: "Charger 2 DCDC hardware fault"
+        severity: "error"
+
+      - name: "CHARGER3_OBC_TIMEOUT"
+        code: 240
+        description: "Charger 3 OBC communication timeout (>1s)"
+        severity: "error"
+
+      - name: "CHARGER3_DCDC_TIMEOUT"
+        code: 241
+        description: "Charger 3 DCDC communication timeout (>1s)"
+        severity: "error"
+
+      - name: "CHARGER3_TX_FAIL"
+        code: 242
+        description: "Charger 3 CAN transmission failed"
+        severity: "warning"
+
+      - name: "CHARGER3_OBC_FAULT"
+        code: 243
         description: "Charger 3 OBC hardware or temperature fault"
+        severity: "error"
+
+      - name: "CHARGER3_DCDC_FAULT"
+        code: 244
+        description: "Charger 3 DCDC hardware fault"
+        severity: "error"
+
+      - name: "CHARGER4_OBC_TIMEOUT"
+        code: 245
+        description: "Charger 4 OBC communication timeout (>1s) [Reserved]"
+        severity: "error"
+
+      - name: "CHARGER4_DCDC_TIMEOUT"
+        code: 246
+        description: "Charger 4 DCDC communication timeout (>1s) [Reserved]"
+        severity: "error"
+
+      - name: "CHARGER4_TX_FAIL"
+        code: 247
+        description: "Charger 4 CAN transmission failed [Reserved]"
+        severity: "warning"
+
+      - name: "CHARGER4_OBC_FAULT"
+        code: 248
+        description: "Charger 4 OBC hardware or temperature fault [Reserved]"
+        severity: "error"
+
+      - name: "CHARGER4_DCDC_FAULT"
+        code: 249
+        description: "Charger 4 DCDC hardware fault [Reserved]"
         severity: "error"
 
   MOTOR_LDU:
