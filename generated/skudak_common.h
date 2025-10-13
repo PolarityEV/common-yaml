@@ -2,8 +2,8 @@
  * @file skudak_common.h
  * @author Bastian de Byl (bastian@polarity.com)
  * @brief I2C protocol constants for VCU communication
- * @version 1.3.0
- * @date 2025-10-12
+ * @version 1.4.0
+ * @date 2025-10-13
  *
  * @copyright Copyright (c) 2025 Polarity EV
  *
@@ -40,6 +40,13 @@
 #define VCU_I2C_LDU_EXT                (0x0A)  ///< Extended LDU info (4 bytes: heatsink temp, water pump duty)
 #define VCU_I2C_BMS_DIAGNOSTICS        (0x0B)  ///< BMS diagnostics - all types (12 bytes: VW=[can_rx, cell_upd, temp_upd], TESLA=[can_rx, cell_upd, reserved], VOLT2=[can1_rx, can3_rx, cell_upd])
 #define VCU_I2C_VW_BMS_DEBUG           VCU_I2C_BMS_DIAGNOSTICS  ///< Legacy alias (deprecated, use VCU_I2C_BMS_DIAGNOSTICS)
+
+/* Charger Control & Monitoring Modes */
+#define VCU_I2C_CHARGER_CONTROL        (0x0C)  ///< Charger control (WRITE: 5 bytes: enable, max_voltage, max_current; RESPONSE: 1 byte: status)
+#define VCU_I2C_CHARGER1_OBC           (0x0D)  ///< Charger 1 OBC state (READ: 16 bytes: voltage, current, status flags, temperature, timeout)
+#define VCU_I2C_CHARGER1_DCDC          (0x0E)  ///< Charger 1 DCDC state (READ: 16 bytes: fault flags, output current, output voltage, output status, temperature, timeout)
+#define VCU_I2C_CHARGER3_OBC           (0x0F)  ///< Charger 3 OBC state (READ: 16 bytes: same format as CHARGER1_OBC)
+#define VCU_I2C_CHARGER3_DCDC          (0x10)  ///< Charger 3 DCDC state (READ: 16 bytes: same format as CHARGER1_DCDC)
 
 /**
  * For VCU error codes, include polarity_errors.h:
