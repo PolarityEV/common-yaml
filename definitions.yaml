@@ -2,13 +2,16 @@
 # Single source of truth for error codes across all platforms
 # Supports: C (STM32), C (ESP32), Dart (Flutter)
 #
-# Version 2.0.0 - 16-bit Error Code System
-# Error codes are now 16-bit (0x0000-0xFFFF) with hexadecimal format
-# BREAKING CHANGE: All error codes renumbered sequentially from 0x0001
+# Version 2.1.0 - Error Category Reorganization
+# BREAKING CHANGE: Categories reorganized for clarity (error codes unchanged)
+# - NEW: CAN category for pure CAN bus/peripheral errors
+# - NEW: BMS category for BMS data and sensor errors
+# - UPDATED: VCU category now focuses on STM32 peripherals (I2C, TIM, UART, system)
+# - UPDATED: CHARGER category excludes TX_FAIL errors (moved to CAN)
 
 project_name: "Polarity"
 prefix: "POLARITY_ERR"
-version: "2.0.0"
+version: "2.1.0"
 
 # Error Source Tracking (for app team visibility)
 sources:
@@ -29,45 +32,10 @@ sources:
 # Format: Explicit hexadecimal strings (e.g., "0x0001")
 # Range: 0x0000-0xFFFF (0-65535)
 categories:
-  VCU:
-    description: "Vehicle Control Unit errors (I2C, CAN, TIM, UART, and system-level)"
+  CAN:
+    description: "CAN bus communication and peripheral errors"
     source: "STM32_VCU"
     errors:
-      - name: "I2C_SLAVE_TX"
-        code: "0x0001"
-        description: "I2C slave transmit failed"
-        severity: "error"
-
-      - name: "I2C_SLAVE_RX"
-        code: "0x0002"
-        description: "I2C slave receive failed"
-        severity: "error"
-
-      - name: "I2C_LISTEN"
-        code: "0x0003"
-        description: "I2C listen mode activation failed"
-        severity: "critical"
-
-      - name: "I2C_ERR_CBK"
-        code: "0x0004"
-        description: "I2C error callback triggered"
-        severity: "error"
-
-      - name: "I2C_SLAVE_TX_CPLT"
-        code: "0x0005"
-        description: "I2C slave transmit complete with error"
-        severity: "error"
-
-      - name: "I2C_SLAVE_RX_CPLT"
-        code: "0x0006"
-        description: "I2C slave receive complete with error"
-        severity: "error"
-
-      - name: "I2C_ENABLE"
-        code: "0x0007"
-        description: "I2C enable failed"
-        severity: "critical"
-
       - name: "CAN1_INIT"
         code: "0x0008"
         description: "CAN1 initialization failed"
@@ -178,6 +146,65 @@ categories:
         description: "Reserved for future CAN errors"
         severity: "info"
 
+      - name: "CHARGER1_TX_FAIL"
+        code: "0x0044"
+        description: "Charger 1 CAN transmission failed [CAN2]"
+        severity: "warning"
+
+      - name: "CHARGER2_TX_FAIL"
+        code: "0x0049"
+        description: "Charger 2 CAN transmission failed [CAN3]"
+        severity: "warning"
+
+      - name: "CHARGER3_TX_FAIL"
+        code: "0x004E"
+        description: "Charger 3 CAN transmission failed [Reserved]"
+        severity: "warning"
+
+      - name: "CHARGER4_TX_FAIL"
+        code: "0x0053"
+        description: "Charger 4 CAN transmission failed [Reserved]"
+        severity: "warning"
+
+  VCU:
+    description: "Vehicle Control Unit peripheral and system errors (I2C, TIM, UART, system-level)"
+    source: "STM32_VCU"
+    errors:
+      - name: "I2C_SLAVE_TX"
+        code: "0x0001"
+        description: "I2C slave transmit failed"
+        severity: "error"
+
+      - name: "I2C_SLAVE_RX"
+        code: "0x0002"
+        description: "I2C slave receive failed"
+        severity: "error"
+
+      - name: "I2C_LISTEN"
+        code: "0x0003"
+        description: "I2C listen mode activation failed"
+        severity: "critical"
+
+      - name: "I2C_ERR_CBK"
+        code: "0x0004"
+        description: "I2C error callback triggered"
+        severity: "error"
+
+      - name: "I2C_SLAVE_TX_CPLT"
+        code: "0x0005"
+        description: "I2C slave transmit complete with error"
+        severity: "error"
+
+      - name: "I2C_SLAVE_RX_CPLT"
+        code: "0x0006"
+        description: "I2C slave receive complete with error"
+        severity: "error"
+
+      - name: "I2C_ENABLE"
+        code: "0x0007"
+        description: "I2C enable failed"
+        severity: "critical"
+
       - name: "TIM1"
         code: "0x001E"
         description: "Timer 1 operation failed"
@@ -273,6 +300,10 @@ categories:
         description: "DC-DC converter error"
         severity: "critical"
 
+  BMS:
+    description: "BMS communication timeouts and battery pack faults"
+    source: "STM32_VCU"
+    errors:
       - name: "BMS1"
         code: "0x0031"
         description: "BMS1 communication or fault"
@@ -372,11 +403,6 @@ categories:
         description: "Charger 1 DCDC communication timeout (>1s) [CAN2]"
         severity: "error"
 
-      - name: "CHARGER1_TX_FAIL"
-        code: "0x0044"
-        description: "Charger 1 CAN transmission failed [CAN2]"
-        severity: "warning"
-
       - name: "CHARGER1_OBC_FAULT"
         code: "0x0045"
         description: "Charger 1 OBC hardware or temperature fault [CAN2]"
@@ -396,11 +422,6 @@ categories:
         code: "0x0048"
         description: "Charger 2 DCDC communication timeout (>1s) [CAN3]"
         severity: "error"
-
-      - name: "CHARGER2_TX_FAIL"
-        code: "0x0049"
-        description: "Charger 2 CAN transmission failed [CAN3]"
-        severity: "warning"
 
       - name: "CHARGER2_OBC_FAULT"
         code: "0x004A"
@@ -422,11 +443,6 @@ categories:
         description: "Charger 3 DCDC communication timeout (>1s) [Reserved]"
         severity: "error"
 
-      - name: "CHARGER3_TX_FAIL"
-        code: "0x004E"
-        description: "Charger 3 CAN transmission failed [Reserved]"
-        severity: "warning"
-
       - name: "CHARGER3_OBC_FAULT"
         code: "0x004F"
         description: "Charger 3 OBC hardware or temperature fault [Reserved]"
@@ -446,11 +462,6 @@ categories:
         code: "0x0052"
         description: "Charger 4 DCDC communication timeout (>1s) [Reserved]"
         severity: "error"
-
-      - name: "CHARGER4_TX_FAIL"
-        code: "0x0053"
-        description: "Charger 4 CAN transmission failed [Reserved]"
-        severity: "warning"
 
       - name: "CHARGER4_OBC_FAULT"
         code: "0x0054"
@@ -739,4 +750,3 @@ categories:
         code: "0x007B"
         description: "Current Sensor 3 CRC validation failed (SAE J1850) [CAN3 0x3C6] (Reserved)"
         severity: "warning"
-
