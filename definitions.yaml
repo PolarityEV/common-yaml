@@ -29,8 +29,8 @@ sources:
 # Format: Explicit hexadecimal strings (e.g., "0x0001")
 # Range: 0x0000-0xFFFF (0-65535)
 categories:
-  I2C:
-    description: "I2C communication errors"
+  VCU:
+    description: "Vehicle Control Unit errors (I2C, CAN, TIM, UART, and system-level)"
     source: "STM32_VCU"
     errors:
       - name: "I2C_SLAVE_TX"
@@ -68,10 +68,6 @@ categories:
         description: "I2C enable failed"
         severity: "critical"
 
-  CAN:
-    description: "CAN bus communication errors"
-    source: "STM32_VCU"
-    errors:
       - name: "CAN1_INIT"
         code: "0x0008"
         description: "CAN1 initialization failed"
@@ -182,10 +178,6 @@ categories:
         description: "Reserved for future CAN errors"
         severity: "info"
 
-  TIM:
-    description: "Timer peripheral errors"
-    source: "STM32_VCU"
-    errors:
       - name: "TIM1"
         code: "0x001E"
         description: "Timer 1 operation failed"
@@ -251,10 +243,6 @@ categories:
         description: "Timer 13 operation failed"
         severity: "error"
 
-  UART:
-    description: "UART serial communication errors"
-    source: "STM32_VCU"
-    errors:
       - name: "UART1"
         code: "0x002B"
         description: "UART1 operation failed"
@@ -265,10 +253,6 @@ categories:
         description: "UART2 operation failed"
         severity: "error"
 
-  VCU_GENERAL:
-    description: "VCU general system errors"
-    source: "STM32_VCU"
-    errors:
       - name: "VCU_INIT"
         code: "0x002D"
         description: "VCU initialization failed"
@@ -374,6 +358,10 @@ categories:
         description: "BMS3 communication timeout (no response to wake-up signals)"
         severity: "error"
 
+  CHARGER:
+    description: "Charger and charging system errors"
+    source: "STM32_VCU"
+    errors:
       - name: "CHARGER1_OBC_TIMEOUT"
         code: "0x0042"
         description: "Charger 1 OBC communication timeout (>1s) [CAN2]"
@@ -489,10 +477,9 @@ categories:
         description: "Charging blocked: vehicle moving (RPM detected)"
         severity: "critical"
 
-  MOTOR_LDU:
+  MOTOR:
     description: "Motor controller and LDU errors"
     source: "LDU_MOTOR"
-    can_id: "0x108"
     errors:
       - name: "MOTOR_OVERCURRENT"
         code: "0x0059"
@@ -674,10 +661,9 @@ categories:
         sine_error_type: "ERROR_STOP"
         action: "CAN message sequence error"
 
-  CURRENT_SENSOR:
-    description: "CSSV1500 current sensor errors (Honeywell ASIL-C sensors on CAN3)"
+  SENSOR:
+    description: "Sensor errors (current sensors, temperature sensors, etc.)"
     source: "STM32_VCU"
-    can_bus: "CAN3"
     errors:
       - name: "CURRENT_SENSOR1_TIMEOUT"
         code: "0x006D"
