@@ -2,8 +2,8 @@
  * @file skudak_common.h
  * @author Bastian de Byl (bastian@polarity.com)
  * @brief I2C protocol constants for VCU communication
- * @version 1.4.0
- * @date 2025-10-13
+ * @version 1.5.0
+ * @date 2025-10-14
  *
  * @copyright Copyright (c) 2025 Polarity EV
  *
@@ -47,6 +47,11 @@
 #define VCU_I2C_CHARGER1_DCDC          (0x0E)  ///< Charger 1 DCDC state (CAN1 bus) (READ: 16 bytes: fault flags, output current, output voltage, output status, temperature, timeout)
 #define VCU_I2C_CHARGER2_OBC           (0x0F)  ///< Charger 2 OBC state (CAN3 bus) (READ: 16 bytes: same format as CHARGER1_OBC)
 #define VCU_I2C_CHARGER2_DCDC          (0x10)  ///< Charger 2 DCDC state (CAN3 bus) (READ: 16 bytes: same format as CHARGER1_DCDC)
+
+/* Current Sensor Monitoring Modes */
+#define VCU_I2C_CURRENT_SENSOR1        (0x11)  ///< Current Sensor 1 state (CAN3 0x3C4) (READ: 16 bytes: current_mA[4], current_A[2], status, sw_ver, timeout, reserved[7]) [Implemented v0.4.0+]
+#define VCU_I2C_CURRENT_SENSOR2        (0x12)  ///< Current Sensor 2 state (CAN3 0x3C5) (READ: 16 bytes: reserved for future use)
+#define VCU_I2C_CURRENT_SENSOR3        (0x13)  ///< Current Sensor 3 state (CAN3 0x3C6) (READ: 16 bytes: reserved for future use)
 
 /**
  * For VCU error codes, include polarity_errors.h:
