@@ -143,16 +143,30 @@ legacy_mapping:
   SKUDAK_ERR_UART3: POLARITY_ERR_UART3
 ```
 
-## Error Code Ranges
+## Error Code Categories (v2.1.0)
 
-| Range     | Category     | Source          | Description                    |
-|-----------|--------------|-----------------|--------------------------------|
-| 100-109   | I2C          | STM32_VCU       | I2C communication errors       |
-| 110-139   | CAN          | STM32_VCU       | CAN bus communication errors   |
-| 140-159   | TIM          | STM32_VCU       | Timer peripheral errors        |
-| 160-169   | UART         | STM32_VCU       | UART serial communication      |
-| 200-249   | VCU_GENERAL  | STM32_VCU       | VCU general system errors      |
-| **250-299**   | **MOTOR_LDU**    | **LDU_MOTOR**       | **Motor controller errors (stm32-sine)** |
+The error code system is organized into 6 distinct categories based on **functional domain**, not numerical ranges:
+
+| Category  | Code Range | Description | Key Principle |
+|-----------|------------|-------------|---------------|
+| **CAN** | 0x0008-0x001D, 0x0044, 0x0049, 0x004E, 0x0053 | CAN bus peripheral and communication errors | "Is the CAN bus infrastructure broken?" |
+| **VCU** | 0x0001-0x0007, 0x001E-0x0030 | STM32 peripherals and system errors (I2C, TIM, UART) | "Is an STM32 peripheral failing?" |
+| **BMS** | 0x0031-0x0041 | BMS communication timeouts and battery pack faults | "Is the battery data bad or unavailable?" |
+| **CHARGER** | 0x0042-0x0058 (excl. TX_FAIL) | Charger hardware faults and safety gates | "Is charging hardware faulty or unsafe?" |
+| **MOTOR** | 0x0059-0x006C | Motor controller and LDU errors (stm32-sine) | "Is the motor controller reporting a fault?" |
+| **SENSOR** | 0x006D-0x007B | Current sensor data errors | "Are sensor readings invalid or out of range?" |
+
+### Category Design Philosophy
+
+**CAN vs Data Errors:** The most important distinction is between:
+- **CAN category:** HAL peripheral failures (e.g., `HAL_CAN_Init()` failed, FIFO overflow, message retrieval error)
+- **Device categories (BMS/CHARGER/SENSOR):** Application-level faults reported *over* functional CAN (e.g., BMS timeout, charger hardware fault, sensor out of range)
+
+**Example:**
+- `POLARITY_ERR_CAN1_INIT` → CAN category (CAN peripheral won't initialize)
+- `POLARITY_ERR_BMS1_TIMEOUT` → BMS category (BMS not sending CAN messages, but CAN bus is functional)
+- `POLARITY_ERR_CHARGER1_TX_FAIL` → CAN category (HAL_CAN_AddTxMessage failed)
+- `POLARITY_ERR_CHARGER1_OBC_FAULT` → CHARGER category (OBC reported hardware fault in its data frame)
 
 ## Motor/LDU Error Details
 
@@ -329,6 +343,20 @@ For issues or questions:
 - Contact firmware team lead
 
 ## Version History
+
+- **v2.1.0** (2025-10-14) - Error category reorganization for clarity
+  - **NEW:** CAN category for pure CAN bus/peripheral errors
+  - **NEW:** BMS category for BMS data and sensor errors
+  - **UPDATED:** VCU category now focuses on STM32 peripherals (I2C, TIM, UART, system)
+  - **UPDATED:** CHARGER category excludes TX_FAIL errors (moved to CAN)
+  - **BREAKING:** Category labels changed (error code values unchanged)
+  - Clarified distinction: "CAN bus broken?" vs "Data/sensor bad?"
+  - No source code changes required
+
+- **v2.0.0** (2025-10-09) - 16-bit error code system
+  - Migrated from 8-bit to 16-bit error codes
+  - All error codes renumbered sequentially from 0x0001
+  - Hexadecimal format for all codes
 
 - **v1.0.0** (2025-10-08) - Initial release with C and Dart support
   - Converted from SKUDAK naming to POLARITY
