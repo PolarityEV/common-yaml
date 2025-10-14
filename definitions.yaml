@@ -376,27 +376,27 @@ categories:
 
       - name: "CHARGER1_OBC_TIMEOUT"
         code: "0x0042"
-        description: "Charger 1 OBC communication timeout (>1s)"
+        description: "Charger 1 OBC communication timeout (>1s) [CAN2]"
         severity: "error"
 
       - name: "CHARGER1_DCDC_TIMEOUT"
         code: "0x0043"
-        description: "Charger 1 DCDC communication timeout (>1s)"
+        description: "Charger 1 DCDC communication timeout (>1s) [CAN2]"
         severity: "error"
 
       - name: "CHARGER1_TX_FAIL"
         code: "0x0044"
-        description: "Charger 1 CAN transmission failed"
+        description: "Charger 1 CAN transmission failed [CAN2]"
         severity: "warning"
 
       - name: "CHARGER1_OBC_FAULT"
         code: "0x0045"
-        description: "Charger 1 OBC hardware or temperature fault"
+        description: "Charger 1 OBC hardware or temperature fault [CAN2]"
         severity: "error"
 
       - name: "CHARGER1_DCDC_FAULT"
         code: "0x0046"
-        description: "Charger 1 DCDC hardware fault"
+        description: "Charger 1 DCDC hardware fault [CAN2]"
         severity: "error"
 
       - name: "CHARGER2_OBC_TIMEOUT"
