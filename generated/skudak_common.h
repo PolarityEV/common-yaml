@@ -53,6 +53,9 @@
 #define VCU_I2C_CURRENT_SENSOR2        (0x12)  ///< Current Sensor 2 state (CAN3 0x3C5) (READ: 16 bytes: reserved for future use)
 #define VCU_I2C_CURRENT_SENSOR3        (0x13)  ///< Current Sensor 3 state (CAN3 0x3C6) (READ: 16 bytes: reserved for future use)
 
+/* DCDC Control Mode */
+#define VCU_I2C_DCDC_CONTROL           (0x14)  ///< DCDC control (WRITE: 2 bytes total [command + 1 data: enable]; RESPONSE: 1 byte: 0=OK, 1=Error) [Charger 1 only, auto-enables on I2C/charging/ignition, v0.4.0+]
+
 /**
  * For VCU error codes, include polarity_errors.h:
  *
