@@ -696,11 +696,6 @@ categories:
         description: "Current Sensor 1 power fault (under/over voltage or internal error) [CAN3 0x3C4]"
         severity: "error"
 
-      - name: "CURRENT_SENSOR1_CRC_FAIL"
-        code: "0x0071"
-        description: "Current Sensor 1 CRC validation failed (SAE J1850) [CAN3 0x3C4]"
-        severity: "warning"
-
       - name: "CURRENT_SENSOR2_TIMEOUT"
         code: "0x0072"
         description: "Current Sensor 2 communication timeout (>1s) [CAN3 0x3C5] (Reserved)"
@@ -721,11 +716,6 @@ categories:
         description: "Current Sensor 2 power fault (under/over voltage or internal error) [CAN3 0x3C5] (Reserved)"
         severity: "error"
 
-      - name: "CURRENT_SENSOR2_CRC_FAIL"
-        code: "0x0076"
-        description: "Current Sensor 2 CRC validation failed (SAE J1850) [CAN3 0x3C5] (Reserved)"
-        severity: "warning"
-
       - name: "CURRENT_SENSOR3_TIMEOUT"
         code: "0x0077"
         description: "Current Sensor 3 communication timeout (>1s) [CAN3 0x3C6] (Reserved)"
@@ -745,8 +735,3 @@ categories:
         code: "0x007A"
         description: "Current Sensor 3 power fault (under/over voltage or internal error) [CAN3 0x3C6] (Reserved)"
         severity: "error"
-
-      - name: "CURRENT_SENSOR3_CRC_FAIL"
-        code: "0x007B"
-        description: "Current Sensor 3 CRC validation failed (SAE J1850) [CAN3 0x3C6] (Reserved)"
-        severity: "warning"
