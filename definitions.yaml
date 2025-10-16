@@ -735,3 +735,42 @@ categories:
         code: "0x007A"
         description: "Current Sensor 3 power fault (under/over voltage or internal error) [CAN3 0x3C6] (Reserved)"
         severity: "error"
+
+  BLE:
+    description: "ESP32 BLE Gateway communication errors (I2C bridge to STM32 VCU)"
+    source: "ESP32_GATEWAY"
+    errors:
+      - name: "ESP32_I2C_TIMEOUT"
+        code: "0x0080"
+        description: "ESP32 I2C transaction timeout communicating with STM32 VCU"
+        severity: "warning"
+
+      - name: "ESP32_I2C_NACK"
+        code: "0x0081"
+        description: "ESP32 received NACK from STM32 VCU (device not responding)"
+        severity: "error"
+
+      - name: "ESP32_I2C_BUS_ERROR"
+        code: "0x0082"
+        description: "ESP32 I2C bus error (SDA/SCL fault)"
+        severity: "error"
+
+      - name: "ESP32_I2C_ARBITRATION_LOST"
+        code: "0x0083"
+        description: "ESP32 I2C arbitration lost"
+        severity: "warning"
+
+      - name: "ESP32_BLE_MBUF_ALLOC_FAIL"
+        code: "0x0084"
+        description: "ESP32 BLE mbuf allocation failed (out of memory)"
+        severity: "error"
+
+      - name: "ESP32_I2C_INVALID_RESPONSE"
+        code: "0x0085"
+        description: "ESP32 received invalid response from STM32 VCU"
+        severity: "error"
+
+      - name: "ESP32_I2C_RETRY_EXHAUSTED"
+        code: "0x0086"
+        description: "ESP32 I2C retry attempts exhausted (3 failures)"
+        severity: "error"
