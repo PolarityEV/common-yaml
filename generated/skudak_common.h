@@ -34,7 +34,7 @@
 #define VCU_I2C_BMS_MODULE_INFO        (0x06)  ///< VW BMS module presence (16 modules × uint8_t = 16 bytes)
 
 /* VCU Diagnostics & Extended Modes */
-#define VCU_I2C_ERR_CODES_V2           (0x07)  ///< Error count only (1 byte: error count 0-64) [BREAKING CHANGE v6.0.0: was 128-byte array; v6.1.0: counts all 64 errors, was limited to 15]
+// 0x07 - RESERVED (removed v6.2.0: error count now calculated by ESP32 from payload)
 #define VCU_I2C_BMS_SUMMARY            (0x08)  ///< BMS voltage summary (10 bytes: min, max, delta, sum voltages)
 #define VCU_I2C_SYSTEM_STATUS          (0x09)  ///< System status (8 bytes: VCU state, BMS state, ignition, charging, run, RPM)
 #define VCU_I2C_LDU_EXT                (0x0A)  ///< Extended LDU info (4 bytes: heatsink temp, water pump duty)
@@ -57,7 +57,7 @@
 #define VCU_I2C_DCDC_CONTROL           (0x14)  ///< DCDC control (WRITE: 2 bytes total [command + 1 data: enable]; RESPONSE: 1 byte: 0=OK, 1=Error) [Charger 1 only, auto-enables on I2C/charging/ignition, v0.4.0+]
 
 /* Error Payload Mode */
-#define VCU_I2C_ERR_PAYLOAD            (0x15)  ///< Error payload (128 bytes: 64 errors × uint16_t LE, may contain 0x0000 padding) [NEW v6.1.0: increased from 30 bytes, companion to VCU_I2C_ERR_CODES_V2]
+#define VCU_I2C_ERR_PAYLOAD            (0x15)  ///< Error payload (128 bytes: 64 errors × uint16_t LE, compact array with 0x0000 terminator) [NEW v6.2.0: single-command protocol, removed 0x07]
 
 /**
  * For VCU error codes, include polarity_errors.h:
