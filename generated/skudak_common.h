@@ -59,6 +59,9 @@
 /* Error Payload Mode */
 #define VCU_I2C_ERR_PAYLOAD            (0x15)  ///< Error payload (128 bytes: 64 errors × uint16_t LE, compact array with 0x0000 terminator) [NEW v6.2.0: single-command protocol, removed 0x07]
 
+/* System Diagnostics Mode */
+#define VCU_I2C_SYSTEM_DIAGNOSTICS     (0x16)  ///< FreeRTOS diagnostics (32 bytes: uptime, heap, task count, IDLE CPU%, per-task stats [11 tasks × 2 bytes: CPU%, stack%]) [NEW v6.2+]
+
 /**
  * For VCU error codes, include polarity_errors.h:
  *
