@@ -61,6 +61,7 @@
 
 /* System Diagnostics Mode */
 #define VCU_I2C_SYSTEM_DIAGNOSTICS     (0x16)  ///< FreeRTOS diagnostics (32 bytes: uptime, heap, task count, IDLE CPU%, per-task stats [11 tasks × 2 bytes: CPU%, stack%]) [NEW v6.2+]
+                                                ///< **IMPORTANT:** System CPU utilization = 100 - IDLE_CPU% (byte 9). Do NOT sum all task percentages (will always be ~100%)!
 
 /**
  * For VCU error codes, include polarity_errors.h:
