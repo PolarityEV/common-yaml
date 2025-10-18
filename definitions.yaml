@@ -310,6 +310,11 @@ categories:
         description: "DC-DC converter error"
         severity: "critical"
 
+      - name: "SYSTEM_CPU_STATS_FAILED"
+        code: "0x007B"
+        description: "FreeRTOS IDLE task not detected - CPU statistics invalid"
+        severity: "warning"
+
   BMS:
     description: "BMS communication timeouts and battery pack faults"
     source: "STM32_VCU"
