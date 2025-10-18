@@ -205,6 +205,16 @@ categories:
         description: "I2C enable failed"
         severity: "critical"
 
+      - name: "I2C_BUSY_TIMEOUT"
+        code: "0x0071"
+        description: "I2C peripheral busy timeout (2ms) waiting for ready state"
+        severity: "error"
+
+      - name: "I2C_DMA_NOT_READY"
+        code: "0x0076"
+        description: "I2C DMA not ready after TX completion (state machine fault)"
+        severity: "error"
+
       - name: "TIM1"
         code: "0x001E"
         description: "Timer 1 operation failed"
