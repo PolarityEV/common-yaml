@@ -240,6 +240,21 @@ categories:
         description: "I2C unknown command received (not in dispatch table)"
         severity: "error"
 
+      - name: "I2C_PERIPHERAL_DISABLED"
+        code: "0x008A"
+        description: "I2C peripheral PE bit cleared unexpectedly (HAL state LISTEN but hardware disabled)"
+        severity: "error"
+
+      - name: "I2C_NVIC_DISABLED"
+        code: "0x008B"
+        description: "I2C NVIC interrupt disabled unexpectedly (auto-recovery applied)"
+        severity: "error"
+
+      - name: "I2C_STARTUP_RESET"
+        code: "0x008C"
+        description: "I2C no traffic for 5 seconds after boot, forced hard reset"
+        severity: "warning"
+
       - name: "TIM1"
         code: "0x001E"
         description: "Timer 1 operation failed"
