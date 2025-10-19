@@ -225,6 +225,21 @@ categories:
         description: "I2C DMA RX overrun (received more than buffer size, data loss possible)"
         severity: "error"
 
+      - name: "I2C_PROTOCOL_ERROR"
+        code: "0x0087"
+        description: "I2C protocol v8.0 state machine error (read requested before command processed)"
+        severity: "error"
+
+      - name: "I2C_NO_RESPONSE"
+        code: "0x0088"
+        description: "I2C no response data prepared for transmission (handler failed)"
+        severity: "error"
+
+      - name: "I2C_UNKNOWN_CMD"
+        code: "0x0089"
+        description: "I2C unknown command received (not in dispatch table)"
+        severity: "error"
+
       - name: "TIM1"
         code: "0x001E"
         description: "Timer 1 operation failed"
