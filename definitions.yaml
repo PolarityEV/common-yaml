@@ -215,6 +215,16 @@ categories:
         description: "I2C DMA not ready after TX completion (state machine fault)"
         severity: "error"
 
+      - name: "I2C_DMA_RX_UNDERRUN"
+        code: "0x007C"
+        description: "I2C DMA RX underrun (incomplete write command, fewer bytes than expected)"
+        severity: "error"
+
+      - name: "I2C_DMA_RX_OVERRUN"
+        code: "0x007D"
+        description: "I2C DMA RX overrun (received more than buffer size, data loss possible)"
+        severity: "error"
+
       - name: "TIM1"
         code: "0x001E"
         description: "Timer 1 operation failed"
