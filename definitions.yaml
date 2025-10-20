@@ -2,6 +2,12 @@
 # Single source of truth for error codes across all platforms
 # Supports: C (STM32), C (ESP32), Dart (Flutter)
 #
+# Version 2.3.0 - Simplified System Diagnostics
+# CHANGE: Removed IDLE task detection (configUSE_IDLE_HOOK removed from FreeRTOS)
+# - REMOVED: SYSTEM_CPU_STATS_FAILED error code (0x007B) - IDLE task tracking no longer used
+# - REASON: CubeMX middleware doesn't expose IDLE task, CPU stats unreliable
+# - MIGRATION: System diagnostics now reports generic statistics (uptime, heap, task count)
+#
 # Version 2.2.0 - UART Protocol Migration
 # BREAKING CHANGE: I2C protocol replaced with UART protocol (I2C error codes deprecated)
 # - REMOVED: All I2C error codes (I2C_*, 0x0001-0x0007, 0x0071, 0x0076, 0x007C-0x0090)
@@ -11,7 +17,7 @@
 
 project_name: "Polarity"
 prefix: "POLARITY_ERR"
-version: "2.2.0"
+version: "2.3.0"
 
 # Error Source Tracking (for app team visibility)
 sources:
@@ -300,10 +306,12 @@ categories:
         description: "DC-DC converter error"
         severity: "critical"
 
-      - name: "SYSTEM_CPU_STATS_FAILED"
-        code: "0x007B"
-        description: "FreeRTOS IDLE task not detected - CPU statistics invalid"
-        severity: "warning"
+      # ============================================================================
+      # DEPRECATED ERROR CODE (v2.3.0)
+      # ============================================================================
+      # 0x007B: SYSTEM_CPU_STATS_FAILED - IDLE task detection removed from FreeRTOS config
+      #         (CubeMX middleware doesn't expose IDLE task, CPU stats unreliable)
+      # ============================================================================
 
   BMS:
     description: "BMS communication timeouts and battery pack faults"
