@@ -227,7 +227,7 @@ categories:
 
       - name: "I2C_PROTOCOL_ERROR"
         code: "0x0087"
-        description: "I2C protocol v9.0 state machine error (read requested before command processed)"
+        description: "I2C protocol state machine error (read requested before command processed)"
         severity: "error"
 
       - name: "I2C_NO_RESPONSE"
