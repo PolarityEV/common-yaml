@@ -227,7 +227,7 @@ categories:
 
       - name: "I2C_PROTOCOL_ERROR"
         code: "0x0087"
-        description: "I2C protocol v8.0 state machine error (read requested before command processed)"
+        description: "I2C protocol v9.0 state machine error (read requested before command processed)"
         severity: "error"
 
       - name: "I2C_NO_RESPONSE"
@@ -254,6 +254,26 @@ categories:
         code: "0x008C"
         description: "I2C no traffic for 5 seconds after boot, forced hard reset"
         severity: "warning"
+
+      - name: "I2C_WATCHDOG_TIMEOUT"
+        code: "0x008D"
+        description: "I2C watchdog detected stuck state (>500ms), auto-recovery triggered"
+        severity: "error"
+
+      - name: "I2C_SOFT_RESET"
+        code: "0x008E"
+        description: "I2C soft reset performed (abort DMA, reset state)"
+        severity: "warning"
+
+      - name: "I2C_HARD_RESET"
+        code: "0x008F"
+        description: "I2C hard reset performed (full HAL reinit, consecutive error threshold)"
+        severity: "error"
+
+      - name: "I2C_BUS_RECOVERY"
+        code: "0x0090"
+        description: "I2C bus recovery performed (GPIO clock pulsing, SDA/SCL stuck)"
+        severity: "critical"
 
       - name: "TIM1"
         code: "0x001E"
