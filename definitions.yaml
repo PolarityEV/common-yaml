@@ -742,40 +742,30 @@ categories:
         severity: "error"
 
   BLE:
-    description: "BLE Gateway communication errors (I2C bridge to VCU)"
+    description: "BLE Gateway communication errors (UART bridge to VCU)"
     source: "ESP32_GATEWAY"
     errors:
-      - name: "ESP32_I2C_TIMEOUT"
+      - name: "ESP32_UART_TIMEOUT"
         code: "0x0080"
-        description: "Gateway I2C transaction timeout communicating with VCU"
+        description: "Gateway UART transaction timeout communicating with VCU"
         severity: "warning"
 
-      - name: "ESP32_I2C_NACK"
+      - name: "ESP32_UART_INVALID_RESPONSE"
         code: "0x0081"
-        description: "Gateway received NACK from VCU (device not responding)"
+        description: "Gateway received invalid response from VCU (length mismatch)"
         severity: "error"
 
-      - name: "ESP32_I2C_BUS_ERROR"
+      - name: "ESP32_UART_BUS_ERROR"
         code: "0x0082"
-        description: "Gateway I2C bus error (SDA/SCL fault)"
+        description: "Gateway UART bus error (TX/RX fault)"
         severity: "error"
-
-      - name: "ESP32_I2C_ARBITRATION_LOST"
-        code: "0x0083"
-        description: "Gateway I2C arbitration lost"
-        severity: "warning"
 
       - name: "ESP32_BLE_MBUF_ALLOC_FAIL"
-        code: "0x0084"
+        code: "0x0083"
         description: "BLE memory allocation failed (out of memory)"
         severity: "error"
 
-      - name: "ESP32_I2C_INVALID_RESPONSE"
-        code: "0x0085"
-        description: "Gateway received invalid response from VCU"
-        severity: "error"
-
-      - name: "ESP32_I2C_RETRY_EXHAUSTED"
-        code: "0x0086"
-        description: "Gateway I2C retry attempts exhausted (3 failures)"
+      - name: "ESP32_UART_PROTOCOL_ERROR"
+        code: "0x0084"
+        description: "Gateway UART protocol error (invalid message format)"
         severity: "error"
