@@ -777,3 +777,21 @@ categories:
         code: "0x0084"
         description: "Gateway UART protocol error (invalid message format)"
         severity: "error"
+
+      - name: "ESP32_STM32_WRITE_INVALID_CMD"
+        code: "0x0085"
+        description: "STM32 rejected write command (unknown command ID)"
+        severity: "error"
+        note: "UART Protocol status 0x01 - check command byte"
+
+      - name: "ESP32_STM32_WRITE_INVALID_LENGTH"
+        code: "0x0086"
+        description: "STM32 rejected write command (payload too short)"
+        severity: "error"
+        note: "UART Protocol status 0x02 - check payload size"
+
+      - name: "ESP32_STM32_WRITE_HANDLER_ERROR"
+        code: "0x0087"
+        description: "STM32 rejected write command (validation failed)"
+        severity: "warning"
+        note: "UART Protocol status 0x03 - params out of range (e.g. duty>100)"
