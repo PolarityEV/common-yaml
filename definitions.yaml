@@ -211,6 +211,24 @@ categories:
         description: "UART unknown command received (not in dispatch table)"
         severity: "error"
 
+      # ============================================================================
+      # VCU DIAGNOSTIC CONTROL ERROR CODES (NEW in v2.4.0)
+      # ============================================================================
+      - name: "VCU_DIAGNOSTIC_CONTROL_TIMEOUT"
+        code: "0x0095"
+        description: "Diagnostic control watchdog timeout (5s elapsed, reverted to safe state)"
+        severity: "warning"
+
+      - name: "VCU_DIAGNOSTIC_CONTACTOR_DENIED"
+        code: "0x0096"
+        description: "Diagnostic contactor enable denied (charging fault state active)"
+        severity: "warning"
+
+      - name: "VCU_DIAGNOSTIC_WPUMP_DUTY_INVALID"
+        code: "0x0097"
+        description: "Diagnostic water pump duty invalid (must be 0 or 9-72%)"
+        severity: "warning"
+
       - name: "TIM1"
         code: "0x001E"
         description: "Timer 1 operation failed"
