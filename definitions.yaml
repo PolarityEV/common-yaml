@@ -255,7 +255,7 @@ categories:
 
       - name: "VCU_DIAGNOSTIC_WPUMP_DUTY_INVALID"
         code: "0x0097"
-        description: "Diagnostic water pump duty invalid (must be 0 or 9-72%)"
+        description: "Diagnostic water pump duty invalid (must be 0-100%)"
         severity: "warning"
 
       # ============================================================================
