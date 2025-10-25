@@ -2,6 +2,14 @@
 # Single source of truth for error codes across all platforms
 # Supports: C (STM32), C (ESP32), Dart (Flutter)
 #
+# Version 2.4.1 - Remove Diagnostic Control Watchdog (2025-10-25)
+# CHANGE: Removed 5-second diagnostic control watchdog (caused unwanted resets)
+# - REMOVED: VCU_DIAGNOSTIC_CONTROL_TIMEOUT error code (0x0095)
+# - REMOVED: DiagnosticControlLastWriteMs timestamp tracking
+# - REMOVED: Watchdog check in GenericVCUTask
+# - REASON: Diagnostic controls should persist until explicitly changed by app
+# - IMPACT: Controls no longer auto-reset after 5 seconds of inactivity
+#
 # Version 2.4.0 - Hardware Cleanup (2025-10-25)
 # CHANGE: Removed unused timer error codes after gauge cluster externalization
 # - REMOVED: TIM2, TIM3, TIM11, TIM13 error codes (0x0022, 0x0023, 0x002B, 0x002D)
@@ -25,7 +33,7 @@
 
 project_name: "Polarity"
 prefix: "POLARITY_ERR"
-version: "2.4.0"
+version: "2.4.1"
 
 # Error Source Tracking (for app team visibility)
 sources:
@@ -237,10 +245,8 @@ categories:
       # ============================================================================
       # VCU DIAGNOSTIC CONTROL ERROR CODES (NEW in v2.4.0)
       # ============================================================================
-      - name: "VCU_DIAGNOSTIC_CONTROL_TIMEOUT"
-        code: "0x0095"
-        description: "Diagnostic control watchdog timeout (5s elapsed, reverted to safe state)"
-        severity: "warning"
+      # 0x0095: VCU_DIAGNOSTIC_CONTROL_TIMEOUT - Removed in v2.4.1 (watchdog removed)
+      #         No longer needed - diagnostic controls persist until changed by app
 
       - name: "VCU_DIAGNOSTIC_CONTACTOR_DENIED"
         code: "0x0096"
