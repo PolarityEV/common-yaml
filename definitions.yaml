@@ -2,6 +2,14 @@
 # Single source of truth for error codes across all platforms
 # Supports: C (STM32), C (ESP32), Dart (Flutter)
 #
+# Version 2.4.0 - Hardware Cleanup (2025-10-25)
+# CHANGE: Removed unused timer error codes after gauge cluster externalization
+# - REMOVED: TIM2, TIM3, TIM11, TIM13 error codes (0x0022, 0x0023, 0x002B, 0x002D)
+# - REMOVED: Duplicate TIM5 error code (0x009C) - now at 0x0025 only
+# - UPDATED: Timer/UART descriptions now specify actual hardware usage
+# - REASON: Gauge cluster moved to external board, timers TIM2/3/11/13 disabled in CubeMX
+# - ACTIVE TIMERS: TIM1 (HAL timebase), TIM4 (water pump PWM), TIM5 (air con PWM)
+#
 # Version 2.3.0 - Simplified System Diagnostics
 # CHANGE: Removed IDLE task detection (configUSE_IDLE_HOOK removed from FreeRTOS)
 # - REMOVED: SYSTEM_CPU_STATS_FAILED error code (0x007B) - IDLE task tracking no longer used
@@ -17,7 +25,7 @@
 
 project_name: "Polarity"
 prefix: "POLARITY_ERR"
-version: "2.3.0"
+version: "2.4.0"
 
 # Error Source Tracking (for app team visibility)
 sources:
@@ -244,79 +252,41 @@ categories:
         description: "Diagnostic water pump duty invalid (must be 0 or 9-72%)"
         severity: "warning"
 
-      - name: "TIM1"
+      # ============================================================================
+      # TIMER ERROR CODES (Active timers only)
+      # TIM1: FreeRTOS HAL timebase (shares TIM1_UP_TIM10_IRQn vector)
+      # TIM4: Water pump PWM (CH3, 100Hz, PD14)
+      # TIM5: Air conditioning PWM (CH4, 150Hz, PA3)
+      # Note: TIM2/3/10/11/13 removed in hardware cleanup (2025-10-25)
+      # ============================================================================
+      - name: "HAL_TIMEBASE_INIT"
         code: "0x0021"
-        description: "Timer 1 operation failed"
-        severity: "error"
-
-      - name: "TIM2"
-        code: "0x0022"
-        description: "Timer 2 operation failed"
-        severity: "error"
-
-      - name: "TIM3"
-        code: "0x0023"
-        description: "Timer 3 operation failed"
-        severity: "error"
+        description: "FreeRTOS HAL timebase initialization failed (TIM1_UP_TIM10_IRQn)"
+        severity: "critical"
 
       - name: "TIM4"
         code: "0x0024"
-        description: "Timer 4 operation failed"
+        description: "TIM4 PWM initialization failed (water pump control, CH3)"
         severity: "error"
 
       - name: "TIM5"
         code: "0x0025"
-        description: "Timer 5 operation failed"
+        description: "TIM5 PWM initialization failed (air conditioning control, CH4)"
         severity: "error"
 
-      - name: "TIM6"
-        code: "0x0026"
-        description: "Timer 6 operation failed"
-        severity: "error"
-
-      - name: "TIM7"
-        code: "0x0027"
-        description: "Timer 7 operation failed"
-        severity: "error"
-
-      - name: "TIM8"
-        code: "0x0028"
-        description: "Timer 8 operation failed"
-        severity: "error"
-
-      - name: "TIM9"
-        code: "0x0029"
-        description: "Timer 9 operation failed"
-        severity: "error"
-
-      - name: "TIM10"
-        code: "0x002A"
-        description: "Timer 10 operation failed"
-        severity: "error"
-
-      - name: "TIM11"
-        code: "0x002B"
-        description: "Timer 11 operation failed"
-        severity: "error"
-
-      - name: "TIM12"
-        code: "0x002C"
-        description: "Timer 12 operation failed"
-        severity: "error"
-
-      - name: "TIM13"
-        code: "0x002D"
-        description: "Timer 13 operation failed"
-        severity: "error"
-
+      # ============================================================================
+      # UART ERROR CODES (Active UARTs only)
+      # UART1: FTDI debug console (PB6/PB7, 115200 baud)
+      # UART2: ESP32 gateway protocol v11.0 (PD5/PD6, 460800 baud, DMA)
+      # ============================================================================
       - name: "UART1"
         code: "0x002E"
-        description: "UART1 operation failed"
+        description: "UART1 operation failed (debug console)"
         severity: "error"
 
       - name: "UART2"
         code: "0x002F"
-        description: "UART2 operation failed"
+        description: "UART2 operation failed (ESP32 gateway protocol)"
         severity: "error"
 
       - name: "VCU_INIT"
@@ -340,10 +310,14 @@ categories:
         severity: "critical"
 
       # ============================================================================
-      # DEPRECATED ERROR CODE (v2.3.0)
+      # DEPRECATED ERROR CODES
       # ============================================================================
-      # 0x007B: SYSTEM_CPU_STATS_FAILED - IDLE task detection removed from FreeRTOS config
+      # 0x007B: SYSTEM_CPU_STATS_FAILED - IDLE task detection removed (v2.3.0)
       #         (CubeMX middleware doesn't expose IDLE task, CPU stats unreliable)
+      # 0x009C: TIM5 - Duplicate removed (v2.4.0), now at 0x0025 with other timer codes
+      # 0x0022-0x0023: TIM2, TIM3 - Removed (v2.4.0), timers disabled in hardware cleanup
+      # 0x0026-0x002D: TIM6-TIM13 - Removed (v2.4.0), timers disabled in hardware cleanup
+      #         Note: 0x0021 repurposed from TIM1 to HAL_TIMEBASE_INIT (more accurate)
       # ============================================================================
 
   BMS:
