@@ -2,6 +2,16 @@
 # Single source of truth for error codes across all platforms
 # Supports: C (STM32), C (ESP32), Dart (Flutter)
 #
+# Version 2.5.0 - Insulation Monitoring Device (IMD) Support (2025-10-29)
+# NEW: Added IMD error codes (0x009D-0x00A1) for Bender ISO175 insulation monitoring
+# - IMD_TIMEOUT: Communication timeout (>1s)
+# - IMD_ISOLATION_ALARM: Critical isolation fault (R_iso < 100kΩ)
+# - IMD_ISOLATION_WARNING: Isolation warning (R_iso < 500kΩ)
+# - IMD_DEVICE_ERROR: Device fault or initialization stuck
+# - IMD_CONNECTION_FAILURE: HV+/HV-/Earth connection fault
+# REASON: Mandatory safety device for monitoring HV system isolation to chassis
+# INTEGRATION: Bender ISO175 on CAN3 @ 500 kbps, IMD_Info_General @ 100ms
+#
 # Version 2.4.1 - Remove Diagnostic Control Watchdog (2025-10-25)
 # CHANGE: Removed 5-second diagnostic control watchdog (caused unwanted resets)
 # - REMOVED: VCU_DIAGNOSTIC_CONTROL_TIMEOUT error code (0x0095)
@@ -33,7 +43,7 @@
 
 project_name: "Polarity"
 prefix: "POLARITY_ERR"
-version: "2.4.1"
+version: "2.5.0"
 
 # Error Source Tracking (for app team visibility)
 sources:
@@ -314,6 +324,34 @@ categories:
         code: "0x009B"
         description: "DC-DC converter error"
         severity: "critical"
+
+      # ============================================================================
+      # INSULATION MONITORING DEVICE (IMD) ERROR CODES (NEW in v2.5.0)
+      # ============================================================================
+      - name: "IMD_TIMEOUT"
+        code: "0x009D"
+        description: "IMD communication timeout (>1s no CAN messages)"
+        severity: "critical"
+
+      - name: "IMD_ISOLATION_ALARM"
+        code: "0x009E"
+        description: "IMD isolation alarm (R_iso < error threshold, default 100kΩ)"
+        severity: "critical"
+
+      - name: "IMD_ISOLATION_WARNING"
+        code: "0x009F"
+        description: "IMD isolation warning (R_iso < warning threshold, default 500kΩ)"
+        severity: "warning"
+
+      - name: "IMD_DEVICE_ERROR"
+        code: "0x00A0"
+        description: "IMD device error or stuck in initialization"
+        severity: "error"
+
+      - name: "IMD_CONNECTION_FAILURE"
+        code: "0x00A1"
+        description: "IMD connection failure (HV+/HV-/Earth fault detected)"
+        severity: "error"
 
       # ============================================================================
       # DEPRECATED ERROR CODES
