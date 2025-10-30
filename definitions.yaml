@@ -2,6 +2,21 @@
 # Single source of truth for error codes across all platforms
 # Supports: C (STM32), C (ESP32), Dart (Flutter)
 #
+# Version 2.6.0 - CAN-Bus-Based Error Code Refactoring (2025-10-30)
+# BREAKING CHANGE: All component error codes now use CAN bus identification
+# - RENAMED: CHARGER1_* → CHARGER_CAN2_* (charger on CAN2 bus)
+# - RENAMED: CHARGER2_* → CHARGER_CAN3_* (charger on CAN3 bus)
+# - ADDED: CHARGER_CAN1_* error codes (reserved for future hardware)
+# - RENAMED: CURRENT_SENSOR1_* → CURRENT_SENSOR_CAN3_* (sensor on CAN3)
+# - RENAMED: CURRENT_SENSOR2_* → CURRENT_SENSOR_CAN2_* (reserved, future hardware)
+# - RENAMED: CURRENT_SENSOR3_* → CURRENT_SENSOR_CAN1_* (reserved, future hardware)
+# - RENAMED: IMD_* → IMD_CAN3_* (IMD on CAN3 bus)
+# - ADDED: IMD_CAN2_* error codes (0x00A2-0x00A6, reserved for future hardware)
+# - ADDED: IMD_CAN1_* error codes (0x00A7-0x00AB, reserved for future hardware)
+# REASON: CAN bus topology provides clearer identification than arbitrary instance numbers
+# IMPACT: ESP32 firmware update REQUIRED (error code names changed)
+# MIGRATION: Component detection system gates timeout errors for missing hardware
+#
 # Version 2.5.0 - Insulation Monitoring Device (IMD) Support (2025-10-29)
 # NEW: Added IMD error codes (0x009D-0x00A1) for Bender ISO175 insulation monitoring
 # - IMD_TIMEOUT: Communication timeout (>1s)
@@ -193,22 +208,22 @@ categories:
         description: "CAN3 transmit failed (mailbox full or bus error)"
         severity: "error"
 
-      - name: "CHARGER1_TX_FAIL"
+      - name: "CHARGER_CAN2_TX_FAIL"
         code: "0x0044"
-        description: "Charger 1 CAN transmission failed [CAN2]"
+        description: "Charger on CAN2 transmission failed"
         severity: "warning"
 
-      - name: "CHARGER2_TX_FAIL"
+      - name: "CHARGER_CAN3_TX_FAIL"
         code: "0x0049"
-        description: "Charger 2 CAN transmission failed [CAN3]"
+        description: "Charger on CAN3 transmission failed"
         severity: "warning"
 
-      - name: "CHARGER3_TX_FAIL"
+      - name: "CHARGER_CAN1_TX_FAIL"
         code: "0x004E"
-        description: "Charger 3 CAN transmission failed [Reserved]"
+        description: "Charger on CAN1 transmission failed [Reserved for future hardware]"
         severity: "warning"
 
-      - name: "CHARGER4_TX_FAIL"
+      - name: "CHARGER_RESERVED_TX_FAIL"
         code: "0x0053"
         description: "Charger 4 CAN transmission failed [Reserved]"
         severity: "warning"
@@ -326,31 +341,84 @@ categories:
         severity: "critical"
 
       # ============================================================================
-      # INSULATION MONITORING DEVICE (IMD) ERROR CODES (NEW in v2.5.0)
+      # INSULATION MONITORING DEVICE (IMD) ERROR CODES - CAN-bus-based (v2.5.0+)
+      # IMD on CAN3: 0x009D-0x00A1
+      # IMD on CAN2: 0x00A2-0x00A6
+      # IMD on CAN1: 0x00A7-0x00AB
       # ============================================================================
-      - name: "IMD_TIMEOUT"
+      - name: "IMD_CAN3_TIMEOUT"
         code: "0x009D"
-        description: "IMD communication timeout (>1s no CAN messages)"
+        description: "IMD on CAN3 communication timeout (>1s no CAN messages)"
         severity: "critical"
 
-      - name: "IMD_ISOLATION_ALARM"
+      - name: "IMD_CAN3_ISOLATION_ALARM"
         code: "0x009E"
-        description: "IMD isolation alarm (R_iso < error threshold, default 100kΩ)"
+        description: "IMD on CAN3 isolation alarm (R_iso < error threshold, default 100kΩ)"
         severity: "critical"
 
-      - name: "IMD_ISOLATION_WARNING"
+      - name: "IMD_CAN3_ISOLATION_WARNING"
         code: "0x009F"
-        description: "IMD isolation warning (R_iso < warning threshold, default 500kΩ)"
+        description: "IMD on CAN3 isolation warning (R_iso < warning threshold, default 500kΩ)"
         severity: "warning"
 
-      - name: "IMD_DEVICE_ERROR"
+      - name: "IMD_CAN3_DEVICE_ERROR"
         code: "0x00A0"
-        description: "IMD device error or stuck in initialization"
+        description: "IMD on CAN3 device error or stuck in initialization"
         severity: "error"
 
-      - name: "IMD_CONNECTION_FAILURE"
+      - name: "IMD_CAN3_CONNECTION_FAILURE"
         code: "0x00A1"
-        description: "IMD connection failure (HV+/HV-/Earth fault detected)"
+        description: "IMD on CAN3 connection failure (HV+/HV-/Earth fault detected)"
+        severity: "error"
+
+      - name: "IMD_CAN2_TIMEOUT"
+        code: "0x00A2"
+        description: "IMD on CAN2 communication timeout (>1s no CAN messages) [Reserved for future hardware]"
+        severity: "critical"
+
+      - name: "IMD_CAN2_ISOLATION_ALARM"
+        code: "0x00A3"
+        description: "IMD on CAN2 isolation alarm (R_iso < error threshold, default 100kΩ) [Reserved for future hardware]"
+        severity: "critical"
+
+      - name: "IMD_CAN2_ISOLATION_WARNING"
+        code: "0x00A4"
+        description: "IMD on CAN2 isolation warning (R_iso < warning threshold, default 500kΩ) [Reserved for future hardware]"
+        severity: "warning"
+
+      - name: "IMD_CAN2_DEVICE_ERROR"
+        code: "0x00A5"
+        description: "IMD on CAN2 device error or stuck in initialization [Reserved for future hardware]"
+        severity: "error"
+
+      - name: "IMD_CAN2_CONNECTION_FAILURE"
+        code: "0x00A6"
+        description: "IMD on CAN2 connection failure (HV+/HV-/Earth fault detected) [Reserved for future hardware]"
+        severity: "error"
+
+      - name: "IMD_CAN1_TIMEOUT"
+        code: "0x00A7"
+        description: "IMD on CAN1 communication timeout (>1s no CAN messages) [Reserved for future hardware]"
+        severity: "critical"
+
+      - name: "IMD_CAN1_ISOLATION_ALARM"
+        code: "0x00A8"
+        description: "IMD on CAN1 isolation alarm (R_iso < error threshold, default 100kΩ) [Reserved for future hardware]"
+        severity: "critical"
+
+      - name: "IMD_CAN1_ISOLATION_WARNING"
+        code: "0x00A9"
+        description: "IMD on CAN1 isolation warning (R_iso < warning threshold, default 500kΩ) [Reserved for future hardware]"
+        severity: "warning"
+
+      - name: "IMD_CAN1_DEVICE_ERROR"
+        code: "0x00AA"
+        description: "IMD on CAN1 device error or stuck in initialization [Reserved for future hardware]"
+        severity: "error"
+
+      - name: "IMD_CAN1_CONNECTION_FAILURE"
+        code: "0x00AB"
+        description: "IMD on CAN1 connection failure (HV+/HV-/Earth fault detected) [Reserved for future hardware]"
         severity: "error"
 
       # ============================================================================
@@ -454,87 +522,87 @@ categories:
         severity: "error"
 
   CHARGER:
-    description: "Charger and charging system errors"
+    description: "Charger and charging system errors (CAN-bus-based identification)"
     source: "STM32_VCU"
     errors:
-      - name: "CHARGER1_OBC_TIMEOUT"
+      - name: "CHARGER_CAN2_OBC_TIMEOUT"
         code: "0x0042"
-        description: "Charger 1 OBC communication timeout (>1s) [CAN2]"
+        description: "Charger on CAN2 OBC communication timeout (>1s)"
         severity: "error"
 
-      - name: "CHARGER1_DCDC_TIMEOUT"
+      - name: "CHARGER_CAN2_DCDC_TIMEOUT"
         code: "0x0043"
-        description: "Charger 1 DCDC communication timeout (>1s) [CAN2]"
+        description: "Charger on CAN2 DCDC communication timeout (>1s)"
         severity: "error"
 
-      - name: "CHARGER1_OBC_FAULT"
+      - name: "CHARGER_CAN2_OBC_FAULT"
         code: "0x0045"
-        description: "Charger 1 OBC hardware or temperature fault [CAN2]"
+        description: "Charger on CAN2 OBC hardware or temperature fault"
         severity: "error"
 
-      - name: "CHARGER1_DCDC_FAULT"
+      - name: "CHARGER_CAN2_DCDC_FAULT"
         code: "0x0046"
-        description: "Charger 1 DCDC hardware fault [CAN2]"
+        description: "Charger on CAN2 DCDC hardware fault"
         severity: "error"
 
-      - name: "CHARGER2_OBC_TIMEOUT"
+      - name: "CHARGER_CAN3_OBC_TIMEOUT"
         code: "0x0047"
-        description: "Charger 2 OBC communication timeout (>1s) [CAN3]"
+        description: "Charger on CAN3 OBC communication timeout (>1s)"
         severity: "error"
 
-      - name: "CHARGER2_DCDC_TIMEOUT"
+      - name: "CHARGER_CAN3_DCDC_TIMEOUT"
         code: "0x0048"
-        description: "Charger 2 DCDC communication timeout (>1s) [CAN3]"
+        description: "Charger on CAN3 DCDC communication timeout (>1s)"
         severity: "error"
 
-      - name: "CHARGER2_OBC_FAULT"
+      - name: "CHARGER_CAN3_OBC_FAULT"
         code: "0x004A"
-        description: "Charger 2 OBC hardware or temperature fault [CAN3]"
+        description: "Charger on CAN3 OBC hardware or temperature fault"
         severity: "error"
 
-      - name: "CHARGER2_DCDC_FAULT"
+      - name: "CHARGER_CAN3_DCDC_FAULT"
         code: "0x004B"
-        description: "Charger 2 DCDC hardware fault [CAN3]"
+        description: "Charger on CAN3 DCDC hardware fault"
         severity: "error"
 
-      - name: "CHARGER3_OBC_TIMEOUT"
+      - name: "CHARGER_CAN1_OBC_TIMEOUT"
         code: "0x004C"
-        description: "Charger 3 OBC communication timeout (>1s) [Reserved]"
+        description: "Charger on CAN1 OBC communication timeout (>1s) [Reserved for future hardware]"
         severity: "error"
 
-      - name: "CHARGER3_DCDC_TIMEOUT"
+      - name: "CHARGER_CAN1_DCDC_TIMEOUT"
         code: "0x004D"
-        description: "Charger 3 DCDC communication timeout (>1s) [Reserved]"
+        description: "Charger on CAN1 DCDC communication timeout (>1s) [Reserved for future hardware]"
         severity: "error"
 
-      - name: "CHARGER3_OBC_FAULT"
+      - name: "CHARGER_CAN1_OBC_FAULT"
         code: "0x004F"
-        description: "Charger 3 OBC hardware or temperature fault [Reserved]"
+        description: "Charger on CAN1 OBC hardware or temperature fault [Reserved for future hardware]"
         severity: "error"
 
-      - name: "CHARGER3_DCDC_FAULT"
+      - name: "CHARGER_CAN1_DCDC_FAULT"
         code: "0x0050"
-        description: "Charger 3 DCDC hardware fault [Reserved]"
+        description: "Charger on CAN1 DCDC hardware fault [Reserved for future hardware]"
         severity: "error"
 
-      - name: "CHARGER4_OBC_TIMEOUT"
+      - name: "CHARGER_RESERVED_OBC_TIMEOUT"
         code: "0x0051"
-        description: "Charger 4 OBC communication timeout (>1s) [Reserved]"
+        description: "Reserved for additional charger OBC timeout"
         severity: "error"
 
-      - name: "CHARGER4_DCDC_TIMEOUT"
+      - name: "CHARGER_RESERVED_DCDC_TIMEOUT"
         code: "0x0052"
-        description: "Charger 4 DCDC communication timeout (>1s) [Reserved]"
+        description: "Reserved for additional charger DCDC timeout"
         severity: "error"
 
-      - name: "CHARGER4_OBC_FAULT"
+      - name: "CHARGER_RESERVED_OBC_FAULT"
         code: "0x0054"
-        description: "Charger 4 OBC hardware or temperature fault [Reserved]"
+        description: "Reserved for additional charger OBC fault"
         severity: "error"
 
-      - name: "CHARGER4_DCDC_FAULT"
+      - name: "CHARGER_RESERVED_DCDC_FAULT"
         code: "0x0055"
-        description: "Charger 4 DCDC hardware fault [Reserved]"
+        description: "Reserved for additional charger DCDC fault"
         severity: "error"
 
       - name: "CHARGER_IGNITION_ON"
@@ -737,67 +805,67 @@ categories:
         action: "CAN message sequence error"
 
   SENSOR:
-    description: "Sensor errors (current sensors, temperature sensors, etc.)"
+    description: "Sensor errors (current sensors, temperature sensors, etc.) - CAN-bus-based identification"
     source: "STM32_VCU"
     errors:
-      - name: "CURRENT_SENSOR1_TIMEOUT"
+      - name: "CURRENT_SENSOR_CAN3_TIMEOUT"
         code: "0x006D"
-        description: "Current Sensor 1 communication timeout (>1s) [CAN3 0x3C4]"
+        description: "Current Sensor on CAN3 communication timeout (>1s) [CAN ID 0x3C4]"
         severity: "error"
 
-      - name: "CURRENT_SENSOR1_INVALID_DATA"
+      - name: "CURRENT_SENSOR_CAN3_INVALID_DATA"
         code: "0x006E"
-        description: "Current Sensor 1 reports invalid current reading [CAN3 0x3C4]"
+        description: "Current Sensor on CAN3 reports invalid current reading [CAN ID 0x3C4]"
         severity: "warning"
 
-      - name: "CURRENT_SENSOR1_OUT_OF_RANGE"
+      - name: "CURRENT_SENSOR_CAN3_OUT_OF_RANGE"
         code: "0x006F"
-        description: "Current Sensor 1 out of range (>±1550A) [CAN3 0x3C4]"
+        description: "Current Sensor on CAN3 out of range (>±1550A) [CAN ID 0x3C4]"
         severity: "warning"
 
-      - name: "CURRENT_SENSOR1_POWER_FAULT"
+      - name: "CURRENT_SENSOR_CAN3_POWER_FAULT"
         code: "0x0070"
-        description: "Current Sensor 1 power fault (under/over voltage or internal error) [CAN3 0x3C4]"
+        description: "Current Sensor on CAN3 power fault (under/over voltage or internal error) [CAN ID 0x3C4]"
         severity: "error"
 
-      - name: "CURRENT_SENSOR2_TIMEOUT"
+      - name: "CURRENT_SENSOR_CAN2_TIMEOUT"
         code: "0x0072"
-        description: "Current Sensor 2 communication timeout (>1s) [CAN3 0x3C5] (Reserved)"
+        description: "Current Sensor on CAN2 communication timeout (>1s) [Reserved for future hardware]"
         severity: "error"
 
-      - name: "CURRENT_SENSOR2_INVALID_DATA"
+      - name: "CURRENT_SENSOR_CAN2_INVALID_DATA"
         code: "0x0073"
-        description: "Current Sensor 2 reports invalid current reading [CAN3 0x3C5] (Reserved)"
+        description: "Current Sensor on CAN2 reports invalid current reading [Reserved for future hardware]"
         severity: "warning"
 
-      - name: "CURRENT_SENSOR2_OUT_OF_RANGE"
+      - name: "CURRENT_SENSOR_CAN2_OUT_OF_RANGE"
         code: "0x0074"
-        description: "Current Sensor 2 out of range (>±1550A) [CAN3 0x3C5] (Reserved)"
+        description: "Current Sensor on CAN2 out of range (>±1550A) [Reserved for future hardware]"
         severity: "warning"
 
-      - name: "CURRENT_SENSOR2_POWER_FAULT"
+      - name: "CURRENT_SENSOR_CAN2_POWER_FAULT"
         code: "0x0075"
-        description: "Current Sensor 2 power fault (under/over voltage or internal error) [CAN3 0x3C5] (Reserved)"
+        description: "Current Sensor on CAN2 power fault (under/over voltage or internal error) [Reserved for future hardware]"
         severity: "error"
 
-      - name: "CURRENT_SENSOR3_TIMEOUT"
+      - name: "CURRENT_SENSOR_CAN1_TIMEOUT"
         code: "0x0077"
-        description: "Current Sensor 3 communication timeout (>1s) [CAN3 0x3C6] (Reserved)"
+        description: "Current Sensor on CAN1 communication timeout (>1s) [Reserved for future hardware]"
         severity: "error"
 
-      - name: "CURRENT_SENSOR3_INVALID_DATA"
+      - name: "CURRENT_SENSOR_CAN1_INVALID_DATA"
         code: "0x0078"
-        description: "Current Sensor 3 reports invalid current reading [CAN3 0x3C6] (Reserved)"
+        description: "Current Sensor on CAN1 reports invalid current reading [Reserved for future hardware]"
         severity: "warning"
 
-      - name: "CURRENT_SENSOR3_OUT_OF_RANGE"
+      - name: "CURRENT_SENSOR_CAN1_OUT_OF_RANGE"
         code: "0x0079"
-        description: "Current Sensor 3 out of range (>±1550A) [CAN3 0x3C6] (Reserved)"
+        description: "Current Sensor on CAN1 out of range (>±1550A) [Reserved for future hardware]"
         severity: "warning"
 
-      - name: "CURRENT_SENSOR3_POWER_FAULT"
+      - name: "CURRENT_SENSOR_CAN1_POWER_FAULT"
         code: "0x007A"
-        description: "Current Sensor 3 power fault (under/over voltage or internal error) [CAN3 0x3C6] (Reserved)"
+        description: "Current Sensor on CAN1 power fault (under/over voltage or internal error) [Reserved for future hardware]"
         severity: "error"
 
   BLE:
