@@ -2,6 +2,16 @@
 # Single source of truth for error codes across all platforms
 # Supports: C (STM32), C (ESP32), Dart (Flutter)
 #
+# Version 2.7.0 - Hardware-Agnostic Error Codes (2025-11-01)
+# BREAKING CHANGE: Error codes renamed to hardware-agnostic terminology
+# - RENAMED: ESP32_* → GATEWAY_* (6 error codes: 0x0080-0x0087)
+# - RENAMED: Source ID "ESP32_GATEWAY" → "BLE_GATEWAY"
+# - RENAMED: Category "BLE" → "GATEWAY"
+# - UPDATED: All error descriptions to remove hardware-specific names (RP2350, ESP32, etc.)
+# REASON: Support future hardware revisions without firmware changes
+# IMPACT: ESP32 firmware update REQUIRED (error code names changed)
+# MIGRATION: Regenerate polarity_errors.h/.dart from updated definitions.yaml
+#
 # Version 2.6.0 - CAN-Bus-Based Error Code Refactoring (2025-10-30)
 # BREAKING CHANGE: All component error codes now use CAN bus identification
 # - RENAMED: CHARGER1_* → CHARGER_CAN2_* (charger on CAN2 bus)
@@ -18,14 +28,14 @@
 # MIGRATION: Component detection system gates timeout errors for missing hardware
 #
 # Version 2.5.0 - Insulation Monitoring Device (IMD) Support (2025-10-29)
-# NEW: Added IMD error codes (0x009D-0x00A1) for Bender ISO175 insulation monitoring
+# NEW: Added IMD error codes (0x009D-0x00A1) for insulation monitoring
 # - IMD_TIMEOUT: Communication timeout (>1s)
 # - IMD_ISOLATION_ALARM: Critical isolation fault (R_iso < 100kΩ)
 # - IMD_ISOLATION_WARNING: Isolation warning (R_iso < 500kΩ)
 # - IMD_DEVICE_ERROR: Device fault or initialization stuck
 # - IMD_CONNECTION_FAILURE: HV+/HV-/Earth connection fault
 # REASON: Mandatory safety device for monitoring HV system isolation to chassis
-# INTEGRATION: Bender ISO175 on CAN3 @ 500 kbps, IMD_Info_General @ 100ms
+# INTEGRATION: IMD on CAN3 @ 500 kbps, IMD_Info_General @ 100ms
 #
 # Version 2.4.1 - Remove Diagnostic Control Watchdog (2025-10-25)
 # CHANGE: Removed 5-second diagnostic control watchdog (caused unwanted resets)
@@ -56,6 +66,20 @@
 # - REASON: STM32F413 I2C dual-address silicon bug (ACK not recognized)
 # - MIGRATION: VCU Protocol v11.0 uses UART (460800 baud, IDLE detection, length-prefixed messages)
 
+# ============================================================
+# Error Code Ranges (Quick Reference)
+# ============================================================
+# 0x0008-0x0020: CAN bus errors (initialization, queue, transmission)
+# 0x0021-0x00AB: VCU peripherals and system (timers, UART, IMD, etc.)
+# 0x0031-0x0041: BMS faults (undervoltage, overvoltage, isolation)
+# 0x0042-0x0056: Charger faults (OBC + DCDC, CAN1/CAN2/CAN3)
+# 0x0059-0x006C: Motor controller faults (LDU errors from stm32-sine)
+# 0x006D-0x007A: Current sensors (CAN1/CAN2/CAN3, timeout/power faults)
+# 0x0080-0x0087: BLE Gateway communication (UART bridge errors)
+# 0x0088-0x008E: J1772 charge port (safety interlocks, autodetection)
+# 0x009D-0x00A1: Insulation monitoring device (IMD, CAN3)
+# ============================================================
+
 project_name: "Polarity"
 prefix: "POLARITY_ERR"
 version: "2.5.0"
@@ -71,9 +95,9 @@ sources:
     location: "stm32-sine firmware (temporary)"
     note: "Will be replaced by STM32-HAL-LDU in future"
 
-  - id: "ESP32_GATEWAY"
-    description: "ESP32 BLE Gateway"
-    location: "ESP32 VCU Bridge firmware"
+  - id: "BLE_GATEWAY"
+    description: "BLE Gateway"
+    location: "BLE Gateway firmware"
 
 # Error codes are now 16-bit with sequential numbering
 # Format: Explicit hexadecimal strings (e.g., "0x0001")
@@ -868,49 +892,102 @@ categories:
         description: "Current Sensor on CAN1 power fault (under/over voltage or internal error) [Reserved for future hardware]"
         severity: "error"
 
-  BLE:
+  GATEWAY:
     description: "BLE Gateway communication errors (UART bridge to VCU)"
-    source: "ESP32_GATEWAY"
+    source: "BLE_GATEWAY"
     errors:
-      - name: "ESP32_UART_TIMEOUT"
+      - name: "GATEWAY_UART_TIMEOUT"
         code: "0x0080"
-        description: "Gateway UART transaction timeout communicating with VCU"
+        description: "BLE Gateway UART timeout while communicating with VCU"
         severity: "warning"
 
-      - name: "ESP32_UART_INVALID_RESPONSE"
+      - name: "GATEWAY_UART_INVALID_RESPONSE"
         code: "0x0081"
         description: "Gateway received invalid response from VCU (length mismatch)"
         severity: "error"
 
-      - name: "ESP32_UART_BUS_ERROR"
+      - name: "GATEWAY_UART_BUS_ERROR"
         code: "0x0082"
         description: "Gateway UART bus error (TX/RX fault)"
         severity: "error"
 
-      - name: "ESP32_BLE_MBUF_ALLOC_FAIL"
+      - name: "GATEWAY_BLE_MBUF_ALLOC_FAIL"
         code: "0x0083"
         description: "BLE memory allocation failed (out of memory)"
         severity: "error"
 
-      - name: "ESP32_UART_PROTOCOL_ERROR"
+      - name: "GATEWAY_UART_PROTOCOL_ERROR"
         code: "0x0084"
         description: "Gateway UART protocol error (invalid message format)"
         severity: "error"
 
-      - name: "ESP32_STM32_WRITE_INVALID_CMD"
+      - name: "GATEWAY_VCU_WRITE_INVALID_CMD"
         code: "0x0085"
-        description: "STM32 rejected write command (unknown command ID)"
+        description: "VCU rejected write command (unknown command ID)"
         severity: "error"
         note: "UART Protocol status 0x01 - check command byte"
 
-      - name: "ESP32_STM32_WRITE_INVALID_LENGTH"
+      - name: "GATEWAY_VCU_WRITE_INVALID_LENGTH"
         code: "0x0086"
-        description: "STM32 rejected write command (payload too short)"
+        description: "VCU rejected write command (payload too short)"
         severity: "error"
         note: "UART Protocol status 0x02 - check payload size"
 
-      - name: "ESP32_STM32_WRITE_HANDLER_ERROR"
+      - name: "GATEWAY_VCU_WRITE_HANDLER_ERROR"
         code: "0x0087"
-        description: "STM32 rejected write command (validation failed)"
+        description: "VCU rejected write command (validation failed)"
         severity: "warning"
         note: "UART Protocol status 0x03 - params out of range (e.g. duty>100)"
+
+  # ============================================================
+  # J1772 CHARGE PORT ERRORS (0x0088-0x008C)
+  # ============================================================
+  # SAE J1772 Electric Vehicle Coupler safety interlocks
+  # Charge port controller monitors J1772 signals
+  # CAN ID 0x200 @ 200ms (timeout 500ms = 2.5x period)
+  # ============================================================
+  J1772:
+    description: "J1772 Charge Port safety interlocks"
+    source: "STM32_VCU"
+    errors:
+      - name: "J1772_TIMEOUT"
+        code: "0x0088"
+        description: "Charge port controller timeout (>500ms)"
+        severity: "error"
+        note: "Check CAN connection to charge port controller, verify 0x200 message"
+
+      - name: "J1772_INVALID_CP_STATE"
+        code: "0x0089"
+        description: "J1772 control pilot not in State C (charging not authorized)"
+        severity: "error"
+        note: "CP state must be C during charging (vehicle ready, EVSE energized)"
+
+      - name: "J1772_PWM_OUT_OF_RANGE"
+        code: "0x008A"
+        description: "J1772 PWM duty cycle out of valid range (not 10-96%)"
+        severity: "error"
+        note: "PWM duty encodes EVSE current limit per SAE J1772 spec"
+
+      - name: "J1772_AC_VOLTAGE_MISSING"
+        code: "0x008B"
+        description: "J1772 AC voltage not detected (EVSE not energized)"
+        severity: "error"
+        note: "AC voltage must be present for charging (120V or 240V)"
+
+      - name: "J1772_PP_BUTTON_PRESSED"
+        code: "0x008C"
+        description: "J1772 proximity pilot button pressed (emergency disconnect)"
+        severity: "warning"
+        note: "User requesting disconnect - ramp down current gracefully"
+
+      - name: "J1772_NOT_DETECTED"
+        code: "0x008D"
+        description: "J1772 charge port not detected during module detection window"
+        severity: "error"
+        note: "Charge port hardware missing or charge port controller firmware not running"
+
+      - name: "J1772_VCU_WATCHDOG"
+        code: "0x008E"
+        description: "Charge port controller watchdog expired (VCU keepalive timeout)"
+        severity: "error"
+        note: "VCU must transmit CAN 0x201 keepalive every <5 seconds"
