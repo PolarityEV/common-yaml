@@ -2,6 +2,10 @@
 # Single source of truth for error codes across all platforms
 # Supports: C (STM32), C (ESP32), Dart (Flutter)
 #
+# Version 2.8.0 - Energy Tracking Error Code (2025-11-04)
+# NEW: Added ENERGY_OVERFLOW error code (0x009C) for 24-hour energy tracking system
+# IMPACT: No breaking changes, new error code only
+#
 # Version 2.7.0 - Hardware-Agnostic Error Codes (2025-11-01)
 # BREAKING CHANGE: Error codes renamed to hardware-agnostic terminology
 # - RENAMED: ESP32_* → GATEWAY_* (6 error codes: 0x0080-0x0087)
@@ -77,12 +81,13 @@
 # 0x006D-0x007A: Current sensors (CAN1/CAN2/CAN3, timeout/power faults)
 # 0x0080-0x0087: BLE Gateway communication (UART bridge errors)
 # 0x0088-0x008E: J1772 charge port (safety interlocks, autodetection)
+# 0x009C:        Energy tracking (24-hour kWh accumulation overflow)
 # 0x009D-0x00A1: Insulation monitoring device (IMD, CAN3)
 # ============================================================
 
 project_name: "Polarity"
 prefix: "POLARITY_ERR"
-version: "2.5.0"
+version: "2.8.0"
 
 # Error Source Tracking (for app team visibility)
 sources:
@@ -363,6 +368,11 @@ categories:
         code: "0x009B"
         description: "DC-DC converter error"
         severity: "critical"
+
+      - name: "ENERGY_OVERFLOW"
+        code: "0x009C"
+        description: "Energy tracking overflow (hourly accumulator exceeded uint16_t max 65,535 Wh)"
+        severity: "warning"
 
       # ============================================================================
       # INSULATION MONITORING DEVICE (IMD) ERROR CODES - CAN-bus-based (v2.5.0+)
