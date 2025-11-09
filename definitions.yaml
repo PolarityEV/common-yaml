@@ -2,6 +2,53 @@
 # Single source of truth for error codes across all platforms
 # Supports: C (STM32), C (ESP32), Dart (Flutter)
 #
+# Version 2.12.0 - Ignition Safety Logic Refactor (2025-11-08)
+# BREAKING CHANGE: Charging safety logic changed to (Ignition OFF) OR (Neutral)
+# - REMOVED: POLARITY_ERR_CHARGER_IGNITION_ON (0x0056) - no longer used
+# - UPDATED: POLARITY_ERR_CHARGER_NOT_NEUTRAL (0x0057) - now only fires if (Ignition ON AND in gear)
+# - NEW: gpio_utils.c/h - Shared GPIO reading utilities (direct GPIO reads, no caching)
+# - IMPROVEMENT: Charger safety now reads ignition GPIO directly (eliminates stale data issues)
+# REASON: Enable climate/entertainment during charging, fix 0x0056 false positive
+# SAFETY: Still blocks charging if ignition ON AND in gear (Forward/Reverse)
+#
+# Version 2.11.0 - Single-OBC Fault Tolerance (2025-11-08) [SUPERSEDED by v2.12.0]
+# NEW: Added per-OBC failure diagnostics (0x0051, 0x0052)
+# - CHARGER_CAN2_OBC_NOT_RESPONDING: OBC on CAN2 not charging (warning, allows single-OBC operation)
+# - CHARGER_CAN3_OBC_NOT_RESPONDING: OBC on CAN3 not charging (warning, allows single-OBC operation)
+# - Charging continues if at least ONE OBC responds (graceful degradation)
+# NEW: Added CHARGING_EVSE_AC_DROPOUT error code (0x00B8)
+# - Differentiates AC dropout from OBC hardware failure during initialization
+# - Helps diagnose EVSE relay issues vs OBC faults
+# IMPROVEMENT: Charge-complete hysteresis added (100mV) to prevent restart oscillation
+# - SafetyFaultLatched now set on OBC init timeout (prevents retry loop)
+# REASON: Improved diagnostics, fault tolerance, and robustness for charging state machine
+#
+# Version 2.10.0 - Charging Diagnostics & Hysteresis (2025-11-08) [SUPERSEDED by v2.11.0]
+#
+# Version 2.9.0 - Charging State Machine v2.1 (No Precharge) (2025-11-07)
+# BREAKING CHANGE: Removed precharge-related error codes (hardware not present)
+# - REMOVED: CHARGING_PRECHARGE_RELAY_FAILED (0x00B0) - No precharge relay in hardware
+# - REMOVED: CHARGING_PRECHARGE_TIMEOUT (0x00B1) - No precharge sequence in v2.1
+# - REMOVED: CHARGING_DC_BUS_UNSTABLE (0x00B3) - DC bus stability check removed (direct contactor connection)
+# - UPDATED: Contactor settling time increased from 500ms to 1000ms to compensate for lack of precharge
+# REASON: Hardware does not have precharge relay or DC bus monitoring circuitry
+# IMPACT: State machine reduced from 15 states to 13 states (removed PRECHARGE_START, PRECHARGE_ACTIVE)
+# MIGRATION: STM32 firmware and ESP32 gateway must regenerate error headers from updated definitions.yaml
+#
+# Version 2.8.0 - Charging State Machine v2.0 Error Codes (2025-11-07) [SUPERSEDED by v2.9.0]
+# NEW: Added charging state machine v2.0 error codes (0x00AC-0x00B7, 12 codes)
+# - CHARGING_BMS_NOT_READY: BMS readiness timeout
+# - CHARGING_USER_AUTH_TIMEOUT: User authorization timeout
+# - CHARGING_CP_VALIDATION_FAILED: CP signal validation failure
+# - CHARGING_MIN_CURRENT_TOO_LOW: EVSE current below minimum
+# - CHARGING_CONTACTOR_CLOSE_FAILED: Main contactor feedback failure
+# - CHARGING_CP_STATE_C_TIMEOUT: CP State C transition timeout
+# - CHARGING_EVSE_NO_AC_POWER: EVSE AC energization timeout
+# - CHARGING_OBC_INIT_FAILED: On-board charger initialization failure
+# - CHARGING_SHUTDOWN_TIMEOUT: Graceful shutdown timeout
+# REASON: Support comprehensive charging state machine with permission and shutdown sequences
+# NOTE: Originally included precharge error codes 0x00B0, 0x00B1, 0x00B3 - removed in v2.9.0
+#
 # Version 2.7.0 - Hardware-Agnostic Error Codes (2025-11-01)
 # BREAKING CHANGE: Error codes renamed to hardware-agnostic terminology
 # - RENAMED: ESP32_* → GATEWAY_* (6 error codes: 0x0080-0x0087)
@@ -78,11 +125,12 @@
 # 0x0080-0x0087: BLE Gateway communication (UART bridge errors)
 # 0x0088-0x008E: J1772 charge port (safety interlocks, autodetection)
 # 0x009D-0x00A1: Insulation monitoring device (IMD, CAN3)
+# 0x00AC-0x00B7: Charging state machine v2.0 (precharge, permission, shutdown)
 # ============================================================
 
 project_name: "Polarity"
 prefix: "POLARITY_ERR"
-version: "2.5.0"
+version: "2.8.0"
 
 # Error Source Tracking (for app team visibility)
 sources:
@@ -609,15 +657,17 @@ categories:
         description: "Charger on CAN1 DCDC hardware fault [Reserved for future hardware]"
         severity: "error"
 
-      - name: "CHARGER_RESERVED_OBC_TIMEOUT"
+      - name: "CHARGER_CAN2_OBC_NOT_RESPONDING"
         code: "0x0051"
-        description: "Reserved for additional charger OBC timeout"
-        severity: "error"
+        description: "Charger on CAN2 OBC receiving commands but not outputting current (may be faulty)"
+        severity: "warning"
+        note: "OBC is communicating but not charging - allows single-OBC operation with degraded performance"
 
-      - name: "CHARGER_RESERVED_DCDC_TIMEOUT"
+      - name: "CHARGER_CAN3_OBC_NOT_RESPONDING"
         code: "0x0052"
-        description: "Reserved for additional charger DCDC timeout"
-        severity: "error"
+        description: "Charger on CAN3 OBC receiving commands but not outputting current (may be faulty)"
+        severity: "warning"
+        note: "OBC is communicating but not charging - allows single-OBC operation with degraded performance"
 
       - name: "CHARGER_RESERVED_OBC_FAULT"
         code: "0x0054"
@@ -629,15 +679,11 @@ categories:
         description: "Reserved for additional charger DCDC fault"
         severity: "error"
 
-      - name: "CHARGER_IGNITION_ON"
-        code: "0x0056"
-        description: "Charging blocked: ignition ON (vehicle operational)"
-        severity: "critical"
-
       - name: "CHARGER_NOT_NEUTRAL"
         code: "0x0057"
-        description: "Charging blocked: transmission not in neutral"
+        description: "Charging blocked: ignition ON while in gear (must be OFF or in neutral)"
         severity: "critical"
+        note: "Charging allowed if ignition OFF OR vehicle in neutral - this error only fires when ignition ON AND in gear (Forward/Reverse)"
 
       - name: "CHARGER_VEHICLE_MOVING"
         code: "0x0058"
@@ -991,3 +1037,183 @@ categories:
         description: "Charge port controller watchdog expired (VCU keepalive timeout)"
         severity: "error"
         note: "VCU must transmit CAN 0x201 keepalive every <5 seconds"
+
+      # NEW: v2.0 Charging State Machine Error Codes (0x00AC-0x00B7)
+      - name: "CHARGING_BMS_NOT_READY"
+        code: "0x00AC"
+        description: "BMS not ready to charge within timeout (30 seconds)"
+        severity: "error"
+        note: "Check BMS communication, safety status, and readiness flags"
+
+      - name: "CHARGING_USER_AUTH_TIMEOUT"
+        code: "0x00AD"
+        description: "User authorization timeout (60 seconds)"
+        severity: "warning"
+        note: "User did not authorize charging via mobile app or RFID within timeout"
+
+      - name: "CHARGING_CP_VALIDATION_FAILED"
+        code: "0x00AE"
+        description: "CP signal validation failed (invalid state or duty cycle)"
+        severity: "error"
+        note: "CP state must be B with valid PWM duty cycle (10-96%) before charging"
+
+      - name: "CHARGING_MIN_CURRENT_TOO_LOW"
+        code: "0x00AF"
+        description: "EVSE available current too low (minimum 6.0A required)"
+        severity: "error"
+        note: "EVSE must provide at least 6.0A for safe charging operation"
+
+      - name: "CHARGING_CONTACTOR_CLOSE_FAILED"
+        code: "0x00B2"
+        description: "Main contactors failed to close (no feedback within 500ms)"
+        severity: "error"
+        note: "Check main contactor wiring, coil power, and feedback signals"
+
+      - name: "CHARGING_CP_STATE_C_TIMEOUT"
+        code: "0x00B4"
+        description: "CP State C transition timeout (J1772 controller did not respond)"
+        severity: "error"
+        note: "Check J1772 charge enable command (CAN 0x201) and controller response"
+
+      - name: "CHARGING_EVSE_NO_AC_POWER"
+        code: "0x00B5"
+        description: "EVSE did not energize AC within timeout (10 seconds)"
+        severity: "error"
+        note: "EVSE may be slow to respond or faulty - check AC detection on charge port"
+
+      - name: "CHARGING_OBC_INIT_FAILED"
+        code: "0x00B6"
+        description: "On-board charger initialization failed (no charging current within 5 seconds)"
+        severity: "error"
+        note: "Check OBC communication, AC power, and initialization sequence"
+
+      - name: "CHARGING_SHUTDOWN_TIMEOUT"
+        code: "0x00B7"
+        description: "Graceful shutdown timeout (5 seconds exceeded)"
+        severity: "warning"
+        note: "Shutdown sequence took longer than expected - forced termination"
+
+      - name: "CHARGING_EVSE_AC_DROPOUT"
+        code: "0x00B8"
+        description: "EVSE AC power dropout during OBC initialization (AC disappeared before charging started)"
+        severity: "error"
+        note: "EVSE relay may be opening due to inrush current or brown-out - check contactor precharge circuit"
+
+      - name: "CHARGING_INVALID_STATE"
+        code: "0x00B9"
+        description: "Charging state machine entered invalid state (corruption detected)"
+        severity: "critical"
+        note: "Should never occur - indicates memory corruption or software bug"
+
+      - name: "CHARGING_CP_STATE_LOST"
+        code: "0x00BA"
+        description: "CP State C lost during active charging (cable disconnect or EVSE fault)"
+        severity: "error"
+        note: "Cable disconnected or EVSE stopped responding during charge"
+
+      - name: "CHARGING_AC_LOST_DURING_CHARGE"
+        code: "0x00BB"
+        description: "EVSE AC power lost during active charging (power outage or relay fault)"
+        severity: "error"
+        note: "Different from init timeout - indicates mid-charge power loss"
+
+      - name: "CHARGING_RETRY_BLOCKED_SAFETY_LATCH"
+        code: "0x00BC"
+        description: "Charging retry blocked: safety fault latched from previous attempt (disconnect plug to reset)"
+        severity: "warning"
+        note: "User must disconnect and reconnect plug to clear safety latch and retry"
+
+      # OBC Detailed Fault Codes - CAN2 (Charger 1)
+      - name: "CHARGER_CAN2_OBC_AC_INPUT_OVERVOLTAGE"
+        code: "0x00BD"
+        description: "Charger on CAN2 OBC reports AC input overvoltage fault (>275V AC)"
+        severity: "error"
+        note: "Check EVSE output voltage - should be 120V or 240V. Charger refusing to charge for safety."
+
+      - name: "CHARGER_CAN2_OBC_TEMPERATURE_FAULT"
+        code: "0x00BE"
+        description: "Charger on CAN2 OBC overtemperature fault (>90°C)"
+        severity: "error"
+        note: "Charger too hot - check cooling system and ambient temperature. Charger will resume when cooled."
+
+      - name: "CHARGER_CAN2_OBC_START_PREVENTED"
+        code: "0x00BF"
+        description: "Charger on CAN2 OBC reports start prevented (internal interlock or fault)"
+        severity: "error"
+        note: "Charger hardware preventing startup - may indicate internal fault or safety interlock."
+
+      # OBC Detailed Fault Codes - CAN3 (Charger 2)
+      - name: "CHARGER_CAN3_OBC_AC_INPUT_OVERVOLTAGE"
+        code: "0x00C0"
+        description: "Charger on CAN3 OBC reports AC input overvoltage fault (>275V AC)"
+        severity: "error"
+        note: "Check EVSE output voltage - should be 120V or 240V. Charger refusing to charge for safety."
+
+      - name: "CHARGER_CAN3_OBC_TEMPERATURE_FAULT"
+        code: "0x00C1"
+        description: "Charger on CAN3 OBC overtemperature fault (>90°C)"
+        severity: "error"
+        note: "Charger too hot - check cooling system and ambient temperature. Charger will resume when cooled."
+
+      - name: "CHARGER_CAN3_OBC_START_PREVENTED"
+        code: "0x00C2"
+        description: "Charger on CAN3 OBC reports start prevented (internal interlock or fault)"
+        severity: "error"
+        note: "Charger hardware preventing startup - may indicate internal fault or safety interlock."
+
+      # OBC Detailed Fault Codes - CAN1 (Reserved for future hardware)
+      - name: "CHARGER_CAN1_OBC_AC_INPUT_OVERVOLTAGE"
+        code: "0x00C3"
+        description: "Charger on CAN1 OBC reports AC input overvoltage fault (>275V AC)"
+        severity: "error"
+        note: "Check EVSE output voltage - should be 120V or 240V. Charger refusing to charge for safety."
+
+      - name: "CHARGER_CAN1_OBC_TEMPERATURE_FAULT"
+        code: "0x00C4"
+        description: "Charger on CAN1 OBC overtemperature fault (>90°C)"
+        severity: "error"
+        note: "Charger too hot - check cooling system and ambient temperature. Charger will resume when cooled."
+
+      - name: "CHARGER_CAN1_OBC_START_PREVENTED"
+        code: "0x00C5"
+        description: "Charger on CAN1 OBC reports start prevented (internal interlock or fault)"
+        severity: "error"
+        note: "Charger hardware preventing startup - may indicate internal fault or safety interlock."
+
+      # OBC CommsStatus Fault Codes (CAN-bus-specific)
+      - name: "CHARGER_CAN2_OBC_COMMS_FAULT"
+        code: "0x00C6"
+        description: "Charger on CAN2 OBC reports VCU communication timeout (>1s no commands received)"
+        severity: "error"
+        note: "OBC starving for commands - check VCU CAN transmission rate (should be <1s interval per Dilong spec) or CAN bus fault"
+
+      - name: "CHARGER_CAN3_OBC_COMMS_FAULT"
+        code: "0x00C7"
+        description: "Charger on CAN3 OBC reports VCU communication timeout (>1s no commands received)"
+        severity: "error"
+        note: "OBC starving for commands - check VCU CAN transmission rate (should be <1s interval per Dilong spec) or CAN bus fault"
+
+      - name: "CHARGER_CAN1_OBC_COMMS_FAULT"
+        code: "0x00C8"
+        description: "Charger on CAN1 OBC reports VCU communication timeout (>1s no commands received)"
+        severity: "error"
+        note: "OBC starving for commands - check VCU CAN transmission rate (should be <1s interval per Dilong spec) or CAN bus fault"
+
+      # OBC HardwareFailure Bit (Standalone, CAN-bus-specific)
+      - name: "CHARGER_CAN2_OBC_HARDWARE_FAILURE"
+        code: "0x00C9"
+        description: "Charger on CAN2 OBC reports internal hardware failure"
+        severity: "error"
+        note: "Separate from temperature fault - indicates internal component failure or power supply issue. Check OBC diagnostics."
+
+      - name: "CHARGER_CAN3_OBC_HARDWARE_FAILURE"
+        code: "0x00CA"
+        description: "Charger on CAN3 OBC reports internal hardware failure"
+        severity: "error"
+        note: "Separate from temperature fault - indicates internal component failure or power supply issue. Check OBC diagnostics."
+
+      - name: "CHARGER_CAN1_OBC_HARDWARE_FAILURE"
+        code: "0x00CB"
+        description: "Charger on CAN1 OBC reports internal hardware failure"
+        severity: "error"
+        note: "Separate from temperature fault - indicates internal component failure or power supply issue. Check OBC diagnostics."
