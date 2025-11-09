@@ -2,6 +2,15 @@
 # Single source of truth for error codes across all platforms
 # Supports: C (STM32), C (ESP32), Dart (Flutter)
 #
+# Version 2.13.0 - SafetyMonitor Specific Error Codes (2025-11-09)
+# NEW: Added SafetyMonitor-specific error codes (0x00CC-0x00CF) for detailed troubleshooting
+# - CHARGING_SAFETY_J1772_TIMEOUT: J1772 timeout during active charging
+# - CHARGING_SAFETY_BMS_CRITICAL_FAULT: BMS fault during charging
+# - CHARGING_SAFETY_IMD_FAULT: IMD isolation fault during charging
+# - CHARGING_SAFETY_EMERGENCY_SHUTDOWN: Emergency shutdown trigger confirmation
+# REASON: Enable precise identification of which SafetyMonitor check failed during charging
+# IMPACT: Improved troubleshooting and diagnostics for charging safety failures
+#
 # Version 2.12.0 - Ignition Safety Logic Refactor (2025-11-08)
 # BREAKING CHANGE: Charging safety logic changed to (Ignition OFF) OR (Neutral)
 # - REMOVED: POLARITY_ERR_CHARGER_IGNITION_ON (0x0056) - no longer used
@@ -131,7 +140,7 @@
 
 project_name: "Polarity"
 prefix: "POLARITY_ERR"
-version: "2.12.0"
+version: "2.13.0"
 
 # Error Source Tracking (for app team visibility)
 sources:
@@ -1223,3 +1232,28 @@ categories:
         description: "Charger on CAN1 OBC reports internal hardware failure"
         severity: "error"
         note: "Separate from temperature fault - indicates internal component failure or power supply issue. Check OBC diagnostics."
+
+      # SafetyMonitor Specific Failure Codes (0x00CC-0x00CF)
+      - name: "CHARGING_SAFETY_J1772_TIMEOUT"
+        code: "0x00CC"
+        description: "SafetyMonitor: J1772 communication timeout during charging (>2000ms)"
+        severity: "critical"
+        note: "Charge port stopped responding during active charging - emergency shutdown triggered"
+
+      - name: "CHARGING_SAFETY_BMS_CRITICAL_FAULT"
+        code: "0x00CD"
+        description: "SafetyMonitor: BMS critical fault detected during charging"
+        severity: "critical"
+        note: "BMS reports overvoltage, undervoltage, or communication timeout - emergency shutdown triggered"
+
+      - name: "CHARGING_SAFETY_IMD_FAULT"
+        code: "0x00CE"
+        description: "SafetyMonitor: IMD isolation fault detected during charging"
+        severity: "critical"
+        note: "IMD reports isolation resistance below critical threshold (<100kΩ) - emergency shutdown triggered"
+
+      - name: "CHARGING_SAFETY_EMERGENCY_SHUTDOWN"
+        code: "0x00CF"
+        description: "SafetyMonitor: Emergency shutdown triggered by safety fault"
+        severity: "critical"
+        note: "One or more safety checks failed - contactors opened, charging stopped, fault latched"
