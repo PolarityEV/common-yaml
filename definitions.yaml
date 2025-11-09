@@ -41,7 +41,7 @@
 # - CHARGING_USER_AUTH_TIMEOUT: User authorization timeout
 # - CHARGING_CP_VALIDATION_FAILED: CP signal validation failure
 # - CHARGING_MIN_CURRENT_TOO_LOW: EVSE current below minimum
-# - CHARGING_CONTACTOR_CLOSE_FAILED: Main contactor feedback failure
+# - CHARGER_CONTACTOR_CLOSE_FAILED: Main contactor feedback failure
 # - CHARGING_CP_STATE_C_TIMEOUT: CP State C transition timeout
 # - CHARGING_EVSE_NO_AC_POWER: EVSE AC energization timeout
 # - CHARGING_OBC_INIT_FAILED: On-board charger initialization failure
@@ -124,13 +124,14 @@
 # 0x006D-0x007A: Current sensors (CAN1/CAN2/CAN3, timeout/power faults)
 # 0x0080-0x0087: BLE Gateway communication (UART bridge errors)
 # 0x0088-0x008E: J1772 charge port (safety interlocks, autodetection)
+# 0x009C:        Energy tracking (24-hour kWh accumulation overflow)
 # 0x009D-0x00A1: Insulation monitoring device (IMD, CAN3)
 # 0x00AC-0x00B7: Charging state machine v2.0 (precharge, permission, shutdown)
 # ============================================================
 
 project_name: "Polarity"
 prefix: "POLARITY_ERR"
-version: "2.8.0"
+version: "2.12.0"
 
 # Error Source Tracking (for app team visibility)
 sources:
@@ -411,6 +412,11 @@ categories:
         code: "0x009B"
         description: "DC-DC converter error"
         severity: "critical"
+
+      - name: "ENERGY_OVERFLOW"
+        code: "0x009C"
+        description: "Energy tracking overflow (hourly accumulator exceeded uint16_t max 65,535 Wh)"
+        severity: "warning"
 
       # ============================================================================
       # INSULATION MONITORING DEVICE (IMD) ERROR CODES - CAN-bus-based (v2.5.0+)
