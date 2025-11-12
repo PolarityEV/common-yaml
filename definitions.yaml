@@ -2,6 +2,26 @@
 # Single source of truth for error codes across all platforms
 # Supports: C (STM32), C (ESP32), Dart (Flutter)
 #
+# Version 2.15.0 - STM32 Charge Controller Fault Codes (2025-11-10)
+# NEW: Added STM32 charge controller fault codes (0x00D4-0x00D9) for hardware-level diagnostics
+# - J1772_CP_VOLTAGE_FAULT: CP voltage out of range (hardware measurement fault)
+# - J1772_PP_VOLTAGE_FAULT: PP voltage out of range (hardware measurement fault)
+# - J1772_AC_DETECTION_FAULT: AC detection circuit fault (L1/L2 inconsistency)
+# - J1772_PWM_FAULT: PWM duty/frequency measurement fault
+# - J1772_VCU_KEEPALIVE_TIMEOUT: VCU keepalive timeout reported by charge controller
+# - J1772_CROSS_VALIDATION_FAULT: CP/PP cross-validation failure
+# REASON: Enable precise troubleshooting of charge port hardware faults reported via CAN
+# IMPACT: Improved diagnostics for J1772 charge port issues, replaces generic error reuse
+#
+# Version 2.14.0 - Charging Pre-Start Safety Gates (2025-11-09)
+# NEW: Added pre-start safety gate error codes (0x00D0-0x00D3) to block unsafe charging attempts
+# - CHARGING_BLOCKED_BMS_NOT_SAFE: BMS ChargeAllowed=0 (overvoltage, undervoltage, data fault)
+# - CHARGING_BLOCKED_VEHICLE_NOT_STATIONARY: Vehicle moving (RPM detected)
+# - CHARGING_BLOCKED_NOT_NEUTRAL: Ignition ON while in gear
+# - CHARGING_BLOCKED_CHARGER_TIMEOUT: Charger not responding or hardware fault
+# REASON: Prevent state machine from advancing to CONTACTORS_CLOSE when safety conditions not met
+# IMPACT: Earlier fault detection, clearer error reporting, prevents unsafe charging attempts
+#
 # Version 2.13.0 - SafetyMonitor Specific Error Codes (2025-11-09)
 # NEW: Added SafetyMonitor-specific error codes (0x00CC-0x00CF) for detailed troubleshooting
 # - CHARGING_SAFETY_J1772_TIMEOUT: J1772 timeout during active charging
@@ -136,11 +156,12 @@
 # 0x009C:        Energy tracking (24-hour kWh accumulation overflow)
 # 0x009D-0x00A1: Insulation monitoring device (IMD, CAN3)
 # 0x00AC-0x00B7: Charging state machine v2.0 (precharge, permission, shutdown)
+# 0x00D0-0x00D9: Charging safety gates and STM32 charge controller faults
 # ============================================================
 
 project_name: "Polarity"
 prefix: "POLARITY_ERR"
-version: "2.13.0"
+version: "2.15.0"
 
 # Error Source Tracking (for app team visibility)
 sources:
@@ -1257,3 +1278,108 @@ categories:
         description: "SafetyMonitor: Emergency shutdown triggered by safety fault"
         severity: "critical"
         note: "One or more safety checks failed - contactors opened, charging stopped, fault latched"
+
+      # Charger Hardware Safety Faults (0x00D0-0x00D4)
+      # These errors trigger emergency shutdown during active charging
+      - name: "CHARGING_SAFETY_CHARGER_HARDWARE_FAULT"
+        code: "0x00D0"
+        description: "SafetyMonitor: Charger hardware failure detected (internal fault)"
+        severity: "critical"
+        note: "OBC reported hardware failure flag - check charger diagnostics, may require charger replacement"
+
+      - name: "CHARGING_SAFETY_CHARGER_OVERTEMP"
+        code: "0x00D1"
+        description: "SafetyMonitor: Charger overtemperature protection active (>90°C)"
+        severity: "critical"
+        note: "OBC internal temperature exceeded safe limit - charging stopped to prevent thermal damage"
+
+      - name: "CHARGING_SAFETY_CHARGER_INPUT_OVERVOLTAGE"
+        code: "0x00D2"
+        description: "SafetyMonitor: Charger input overvoltage protection (AC >275V)"
+        severity: "critical"
+        note: "EVSE AC voltage exceeded safe input limit - check EVSE wiring and voltage regulation"
+
+      - name: "CHARGING_SAFETY_CHARGER_OUTPUT_OVERVOLTAGE"
+        code: "0x00D3"
+        description: "SafetyMonitor: Charger output overvoltage detected (>420V pack voltage)"
+        severity: "critical"
+        note: "OBC output voltage exceeded safe battery limit - immediate shutdown to prevent cell damage"
+
+      - name: "CHARGING_SAFETY_CHARGER_OVERCURRENT"
+        code: "0x00D4"
+        description: "SafetyMonitor: Charger overcurrent detected (>25A per charger)"
+        severity: "critical"
+        note: "OBC output current exceeded hardware absolute maximum - emergency shutdown to prevent charger damage"
+
+      # Charging Pre-Start Safety Gate Failures (0x00D5-0x00D9)
+      # These errors prevent charging from starting (block transition to CONTACTORS_CLOSE)
+      - name: "CHARGING_BLOCKED_BMS_NOT_SAFE"
+        code: "0x00D5"
+        description: "Charging blocked: BMS ChargeAllowed flag is false (overvoltage, undervoltage, or data fault)"
+        severity: "error"
+        note: "Check BMS safety status - may indicate overvoltage (>4.15V/cell), undervoltage (<2.5V/cell), excessive delta (>200mV), or faulty cell data"
+
+      - name: "CHARGING_BLOCKED_VEHICLE_NOT_STATIONARY"
+        code: "0x00D6"
+        description: "Charging blocked: Vehicle is not stationary (RPM detected)"
+        severity: "error"
+        note: "Cannot charge while vehicle is moving - ensure RPM is below threshold and vehicle is parked"
+
+      - name: "CHARGING_BLOCKED_NOT_NEUTRAL"
+        code: "0x00D7"
+        description: "Charging blocked: Ignition ON while in gear (must be OFF or in neutral)"
+        severity: "error"
+        note: "For safety, charging requires ignition OFF (parked) or in NEUTRAL (climate/systems active)"
+
+      - name: "CHARGING_BLOCKED_CHARGER_TIMEOUT"
+        code: "0x00D8"
+        description: "Charging blocked: Charger communication timeout or hardware fault"
+        severity: "error"
+        note: "Charger not responding or reporting hardware failure - check CAN bus and charger power"
+
+      # STM32 Charge Controller Fault Codes (0x00D9-0x00DD)
+      # These error codes map to specific fault flags reported by the STM32 charge controller
+      # See CHARGE_PORT_FAULT_* bitfield definitions in vcu_types.h
+      - name: "J1772_CP_VOLTAGE_FAULT"
+        code: "0x00D9"
+        description: "J1772 control pilot voltage out of range (hardware fault)"
+        severity: "error"
+        note: "STM32 charge controller detected CP voltage outside valid thresholds - check charge port hardware"
+
+      - name: "J1772_PP_VOLTAGE_FAULT"
+        code: "0x00DA"
+        description: "J1772 proximity pilot voltage out of range (hardware fault)"
+        severity: "error"
+        note: "STM32 charge controller detected PP voltage outside valid thresholds - check charge port hardware"
+
+      - name: "J1772_AC_DETECTION_FAULT"
+        code: "0x00DB"
+        description: "J1772 AC detection circuit fault (only L1 or L2 detected, not both or neither)"
+        severity: "error"
+        note: "STM32 charge controller detected AC fault - check EVSE wiring and AC detection circuit"
+
+      - name: "J1772_PWM_FAULT"
+        code: "0x00DC"
+        description: "J1772 PWM duty cycle or frequency invalid (hardware measurement fault)"
+        severity: "error"
+        note: "STM32 charge controller detected PWM measurement fault - check CP signal quality"
+
+      - name: "J1772_VCU_KEEPALIVE_TIMEOUT"
+        code: "0x00DD"
+        description: "J1772 charge controller reports VCU keepalive timeout (no CAN 0x201 for >5 seconds)"
+        severity: "error"
+        note: "VCU must transmit CAN 0x201 keepalive every <5 seconds to maintain charge port controller operation"
+
+      - name: "J1772_CROSS_VALIDATION_FAULT"
+        code: "0x00DE"
+        description: "J1772 CP/PP cross-validation failed (inconsistent state)"
+        severity: "error"
+        note: "STM32 charge controller detected CP and PP signals in inconsistent states - possible wiring fault"
+
+      # Module Detection Warnings (0x00DF)
+      # These warnings help diagnose hardware issues during system startup
+      - name: "IMD_NOT_DETECTED"
+        code: "0x00DF"
+        description: "IMD not detected after 15 seconds - check 12V power and HV connections"
+        severity: "warning"
+        note: "Bender IMD should transmit ID 0x037 automatically at power-on (no wake-up message needed). Check 12V power (Pin 2), HV measurement wires (HV+, HV-, PE), and CAN termination. May indicate defective IMD or loose wiring."
