@@ -449,6 +449,28 @@ categories:
         severity: "warning"
 
       # ============================================================================
+      # I2C EEPROM ERROR CODES (0x00E1-0x00E3)
+      # AT34C04 4Kbit EEPROM for persistent configuration storage
+      # ============================================================================
+      - name: "EEPROM_INIT_FAILED"
+        code: "0x00E1"
+        description: "I2C EEPROM initialization failed (device not responding on I2C bus)"
+        severity: "error"
+        note: "Check I2C connections and AT34C04 power - VCU will use default configuration values"
+
+      - name: "EEPROM_READ_FAILED"
+        code: "0x00E2"
+        description: "I2C EEPROM read operation failed (I2C timeout or bus error)"
+        severity: "warning"
+        note: "VCU will use default configuration values - check I2C signal integrity"
+
+      - name: "EEPROM_DATA_CORRUPTION"
+        code: "0x00E3"
+        description: "I2C EEPROM data corruption detected (all 3 redundant copies differ or CRC mismatch)"
+        severity: "warning"
+        note: "Triple-redundancy failed - VCU will use default configuration and attempt to repair EEPROM data"
+
+      # ============================================================================
       # INSULATION MONITORING DEVICE (IMD) ERROR CODES - CAN-bus-based (v2.5.0+)
       # IMD on CAN3: 0x009D-0x00A1
       # IMD on CAN2: 0x00A2-0x00A6
