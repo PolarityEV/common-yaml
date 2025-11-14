@@ -1439,3 +1439,11 @@ categories:
         description: "Range estimate unavailable - insufficient driving data (<1 km in last 4 hours)"
         severity: "info"
         note: "Range estimate requires at least 1km of driving data over the last 4 hours to calculate accurate efficiency. Continue driving to enable range estimation."
+
+      # 12V Battery Tender (0x00E7)
+      # Automatic 12V battery maintenance during idle/standby periods
+      - name: "VOLT12_TENDER_DISABLED"
+        code: "0x00E7"
+        description: "12V battery monitoring disabled - charge port not detected"
+        severity: "warning"
+        note: "12V battery voltage sensor unavailable (charge port controller timeout or not detected). Automatic 12V maintenance charging disabled. DCDC will still operate during ignition ON and HV charging."
