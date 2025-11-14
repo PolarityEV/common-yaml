@@ -1376,10 +1376,16 @@ categories:
         severity: "error"
         note: "STM32 charge controller detected CP and PP signals in inconsistent states - possible wiring fault"
 
-      # Module Detection Warnings (0x00DF)
+      # Module Detection Warnings (0x00DF-0x00E0)
       # These warnings help diagnose hardware issues during system startup
       - name: "IMD_NOT_DETECTED"
         code: "0x00DF"
         description: "IMD not detected after 15 seconds - check 12V power and HV connections"
         severity: "warning"
         note: "Bender IMD should transmit ID 0x037 automatically at power-on (no wake-up message needed). Check 12V power (Pin 2), HV measurement wires (HV+, HV-, PE), and CAN termination. May indicate defective IMD or loose wiring."
+
+      - name: "CURRENT_SENSOR_NOT_DETECTED"
+        code: "0x00E0"
+        description: "Current sensor not detected after 15 seconds - check 12V power and CAN connections"
+        severity: "warning"
+        note: "ISA Scale IVT-S current sensor should transmit ID 0x3C4 automatically at power-on. Check 12V power, CAN wiring (CANH/CANL), and CAN termination. May indicate defective sensor or loose wiring."
