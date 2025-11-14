@@ -2,6 +2,14 @@
 # Single source of truth for error codes across all platforms
 # Supports: C (STM32), C (ESP32), Dart (Flutter)
 #
+# Version 2.16.0 - Odometer and Range Estimation Diagnostics (2025-11-14)
+# NEW: Added odometer/range estimation error codes (0x00E4-0x00E6) for diagnostics
+# - ODOMETER_RPM_OVERFLOW_DETECTED: RPM accumulator overflow (warning)
+# - ODOMETER_DISTANCE_SANITY_CHECK_FAILED: Implausible distance rejected (info)
+# - ODOMETER_RANGE_ESTIMATE_UNAVAILABLE: Insufficient data for range calc (info)
+# REASON: Enable monitoring of odometer health and range estimation data quality
+# IMPACT: Improved troubleshooting for odometer tracking and range accuracy
+#
 # Version 2.15.0 - STM32 Charge Controller Fault Codes (2025-11-10)
 # NEW: Added STM32 charge controller fault codes (0x00D4-0x00D9) for hardware-level diagnostics
 # - J1772_CP_VOLTAGE_FAULT: CP voltage out of range (hardware measurement fault)
@@ -1411,3 +1419,23 @@ categories:
         description: "Current sensor not detected after 15 seconds - check 12V power and CAN connections"
         severity: "warning"
         note: "ISA Scale IVT-S current sensor should transmit ID 0x3C4 automatically at power-on. Check 12V power, CAN wiring (CANH/CANL), and CAN termination. May indicate defective sensor or loose wiring."
+
+      # Odometer and Range Estimation (0x00E4-0x00E6)
+      # Informational messages for odometer functionality and range estimation
+      - name: "ODOMETER_RPM_OVERFLOW_DETECTED"
+        code: "0x00E4"
+        description: "Odometer RPM accumulator overflow detected - sample skipped"
+        severity: "warning"
+        note: "RPM accumulator exceeded safe threshold before odometer task cleared it. This may indicate odometer task not running at 1Hz or extreme RPM conditions. Distance tracking temporarily paused."
+
+      - name: "ODOMETER_DISTANCE_SANITY_CHECK_FAILED"
+        code: "0x00E5"
+        description: "Odometer calculated distance exceeded plausible threshold (>100m in 1 second)"
+        severity: "info"
+        note: "Calculated distance sample rejected as implausible. This is normal during RPM spikes or data corruption. Odometer continues tracking with next valid sample."
+
+      - name: "ODOMETER_RANGE_ESTIMATE_UNAVAILABLE"
+        code: "0x00E6"
+        description: "Range estimate unavailable - insufficient driving data (<1 km in last 4 hours)"
+        severity: "info"
+        note: "Range estimate requires at least 1km of driving data over the last 4 hours to calculate accurate efficiency. Continue driving to enable range estimation."
