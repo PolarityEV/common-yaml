@@ -2,6 +2,14 @@
 # Single source of truth for error codes across all platforms
 # Supports: C (STM32), C (ESP32), Dart (Flutter)
 #
+# Version 2.17.0 - LDU Parameter Tuning Error Codes (2025-11-14)
+# NEW: Added LDU parameter tuning error codes (0x00E8-0x00EA) for Phase 6 implementation
+# - LDU_SDO_TIMEOUT: CANopen SDO write timeout (>500ms, 3 retries failed)
+# - LDU_PARAM_WRITE_FAILED: SDO abort or verification mismatch
+# - LDU_INIT_FAILED: Tuning module initialization failure
+# REASON: Enable diagnostics for drive mode switching, speed limiting, and valet mode
+# IMPACT: Improved troubleshooting for LDU parameter tuning via CANopen SDO
+#
 # Version 2.16.0 - Odometer and Range Estimation Diagnostics (2025-11-14)
 # NEW: Added odometer/range estimation error codes (0x00E4-0x00E6) for diagnostics
 # - ODOMETER_RPM_OVERFLOW_DETECTED: RPM accumulator overflow (warning)
@@ -169,7 +177,7 @@
 
 project_name: "Polarity"
 prefix: "POLARITY_ERR"
-version: "2.15.0"
+version: "2.17.0"
 
 # Error Source Tracking (for app team visibility)
 sources:
@@ -939,6 +947,28 @@ categories:
         sine_error_name: "ERR_CANCOUNTER"
         sine_error_type: "ERROR_STOP"
         action: "CAN message sequence error"
+
+      # ============================================================================
+      # LDU PARAMETER TUNING ERROR CODES (Phase 6 implementation)
+      # CANopen SDO writes for drive mode switching, speed limiting, valet mode
+      # ============================================================================
+      - name: "LDU_SDO_TIMEOUT"
+        code: "0x00E8"
+        description: "LDU CANopen SDO parameter write timeout (>500ms, 3 retries failed)"
+        severity: "warning"
+        note: "LDU not responding to parameter write via SDO (0x601/0x581). Check CAN bus and LDU firmware version (requires v5.35.R+ for parameter support). Drive modes will use default settings."
+
+      - name: "LDU_PARAM_WRITE_FAILED"
+        code: "0x00E9"
+        description: "LDU parameter write failed (SDO abort or verification mismatch)"
+        severity: "warning"
+        note: "LDU rejected parameter write or readback verification failed. Parameter may not be supported in current firmware. Drive modes will continue with last known good values."
+
+      - name: "LDU_INIT_FAILED"
+        code: "0x00EA"
+        description: "LDU tuning initialization failed (parameter queue full or SDO driver unavailable)"
+        severity: "error"
+        note: "LDU tuning module failed to initialize - check SDO driver and parameter queue allocation. Drive mode switching disabled."
 
   SENSOR:
     description: "Sensor errors (current sensors, temperature sensors, etc.) - CAN-bus-based identification"
