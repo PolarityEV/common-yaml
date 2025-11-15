@@ -1477,3 +1477,11 @@ categories:
         description: "12V battery monitoring disabled - charge port not detected"
         severity: "warning"
         note: "12V battery voltage sensor unavailable (charge port controller timeout or not detected). Automatic 12V maintenance charging disabled. DCDC will still operate during ignition ON and HV charging."
+
+      # Self-Test Framework (0x00EB)
+      # Pre-RTOS hardware validation during boot sequence
+      - name: "SELF_TEST_FAILED"
+        code: "0x00EB"
+        description: "Self-test failed during initialization - hardware validation error"
+        severity: "error"
+        note: "One or more hardware validation tests failed during boot sequence. Check specific test results for details (GPOD outputs, CAN bus, EEPROM). If test is non-fatal, system will continue boot with degraded functionality."
