@@ -1,0 +1,95 @@
+name: Deploy Error Definitions to S3
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'definitions.yaml'
+
+permissions:
+  id-token: write  # Required for AWS OIDC authentication
+  contents: read
+
+jobs:
+  deploy:
+    name: Validate and Deploy to S3
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install pyyaml jinja2
+
+      - name: Validate definitions.yaml
+        run: |
+          python3 -c "
+          import yaml
+          import sys
+
+          try:
+              with open('definitions.yaml', 'r') as f:
+                  data = yaml.safe_load(f)
+
+              # Validate structure
+              if 'sources' not in data:
+                  print('ERROR: Missing \"sources\" key in definitions.yaml')
+                  sys.exit(1)
+
+              # Count error codes
+              total_errors = 0
+              for source_name, source_data in data['sources'].items():
+                  if 'errors' in source_data:
+                      total_errors += len(source_data['errors'])
+
+              print(f'✓ Validation passed: {total_errors} error codes defined')
+
+              # Extract version if present
+              with open('definitions.yaml', 'r') as f:
+                  first_lines = [f.readline() for _ in range(20)]
+                  for line in first_lines:
+                      if line.startswith('# Version'):
+                          print(f'✓ {line.strip()}')
+                          break
+
+          except yaml.YAMLError as e:
+              print(f'ERROR: Invalid YAML syntax: {e}')
+              sys.exit(1)
+          except Exception as e:
+              print(f'ERROR: Validation failed: {e}')
+              sys.exit(1)
+          "
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Upload to S3
+        run: |
+          aws s3 cp definitions.yaml s3://polarity.firmware/definitions/latest.yaml \
+            --acl public-read \
+            --cache-control "max-age=300" \
+            --metadata "deployment-time=$(date -u +%Y-%m-%dT%H:%M:%SZ),git-sha=${{ github.sha }}"
+
+          echo "✓ Deployed to s3://polarity.firmware/definitions/latest.yaml"
+          echo "✓ Public URL: https://polarity.firmware.s3.amazonaws.com/definitions/latest.yaml"
+
+      - name: Deployment summary
+        run: |
+          echo "### Deployment Complete :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**File:** \`definitions.yaml\`" >> $GITHUB_STEP_SUMMARY
+          echo "**S3 Path:** \`s3://polarity.firmware/definitions/latest.yaml\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Public URL:** https://polarity.firmware.s3.amazonaws.com/definitions/latest.yaml" >> $GITHUB_STEP_SUMMARY
+          echo "**Git SHA:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_STEP_SUMMARY

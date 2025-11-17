@@ -2,6 +2,16 @@
 # Single source of truth for error codes across all platforms
 # Supports: C (STM32), C (ESP32), Dart (Flutter)
 #
+# Version 2.18.0 - 12V Battery Tender Diagnostic Error Codes (2025-11-17)
+# NEW: Added 12V tender diagnostic error codes (0x00EC-0x00F0) for Phase 7 implementation
+# - VOLT12_TENDER_BLOCKED_INTERLOCKS: Safety interlocks preventing charging (info)
+# - VOLT12_TENDER_DCDC_UNAVAILABLE: DCDC charger not detected via CAN (warning)
+# - VOLT12_TENDER_DCDC_NOT_RESPONDING: DCDC enabled but not charging after 30s (error)
+# - VOLT12_TENDER_VOLTAGE_MEASUREMENT_FAULT: Voltage reading implausible (warning)
+# - VOLT12_TENDER_COOLDOWN_BYPASS_CRITICAL: Emergency bypass due to critical voltage (warning)
+# REASON: Enable comprehensive diagnostics for 12V battery maintenance to prevent deep discharge
+# IMPACT: Improved troubleshooting for 12V tender failures that could lead to system failure
+#
 # Version 2.17.0 - LDU Parameter Tuning Error Codes (2025-11-14)
 # NEW: Added LDU parameter tuning error codes (0x00E8-0x00EA) for Phase 6 implementation
 # - LDU_SDO_TIMEOUT: CANopen SDO write timeout (>500ms, 3 retries failed)
@@ -1428,13 +1438,43 @@ categories:
         severity: "info"
         note: "Range estimate requires at least 1km of driving data over the last 4 hours to calculate accurate efficiency. Continue driving to enable range estimation."
 
-      # 12V Battery Tender (0x00E7)
+      # 12V Battery Tender (0x00E7, 0x00EC-0x00F0)
       # Automatic 12V battery maintenance during idle/standby periods
       - name: "VOLT12_TENDER_DISABLED"
         code: "0x00E7"
         description: "12V battery monitoring disabled - charge port not detected"
         severity: "warning"
         note: "12V battery voltage sensor unavailable (charge port controller timeout or not detected). Automatic 12V maintenance charging disabled. DCDC will still operate during ignition ON and HV charging."
+
+      - name: "VOLT12_TENDER_BLOCKED_INTERLOCKS"
+        code: "0x00EC"
+        description: "12V battery tender blocked by safety interlocks"
+        severity: "info"
+        note: "Automatic 12V charging blocked due to active safety conditions (ignition ON, HV charging active, or charge port unavailable). This is normal operation - tender will resume when vehicle returns to idle state."
+
+      - name: "VOLT12_TENDER_DCDC_UNAVAILABLE"
+        code: "0x00ED"
+        description: "DCDC charger not detected for 12V battery charging"
+        severity: "warning"
+        note: "DCDC charger module not responding via CAN bus (>1s timeout or IsDetected=0). 12V battery cannot be automatically charged. Check DCDC charger hardware, CAN bus wiring, and charger firmware. DCDC may still charge during ignition ON if hardware functional."
+
+      - name: "VOLT12_TENDER_DCDC_NOT_RESPONDING"
+        code: "0x00EE"
+        description: "DCDC charger enabled but not producing voltage after 30 seconds"
+        severity: "error"
+        note: "DCDC command sent (DCDCEnabled=1) but 12V voltage not rising as expected after contactor settling delay. Possible hardware failure, contactors not closing, or DCDC internal fault. Check DCDC hardware, HV contactor operation, and wiring."
+
+      - name: "VOLT12_TENDER_VOLTAGE_MEASUREMENT_FAULT"
+        code: "0x00EF"
+        description: "12V battery voltage reading implausible or out of range"
+        severity: "warning"
+        note: "Voltage reading outside physically possible range (8.0-15.5V). Indicates charge port voltage sensor fault, wiring issue, or ADC problem. 12V tender disabled until valid readings restored. Check charge port CAN messages and voltage scaling."
+
+      - name: "VOLT12_TENDER_COOLDOWN_BYPASS_CRITICAL"
+        code: "0x00F0"
+        description: "Cooldown period bypassed due to critically low 12V voltage"
+        severity: "warning"
+        note: "Emergency bypass of 2-hour cooldown period triggered by critical voltage threshold (<11.5V). Indicates rapid voltage drop after charging (possible parasitic drain, alternator failure, or battery fault). Normal cooldown prevents slam-cycling, but critical voltage takes priority to prevent deep discharge."
 
       # Self-Test Framework (0x00EB)
       # Pre-RTOS hardware validation during boot sequence
