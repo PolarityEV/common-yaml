@@ -39,20 +39,32 @@ jobs:
               with open('definitions.yaml', 'r') as f:
                   data = yaml.safe_load(f)
 
-              # Validate structure
-              if 'sources' not in data:
-                  print('ERROR: Missing \"sources\" key in definitions.yaml')
+              # Validate required top-level keys
+              required_keys = ['project_name', 'prefix', 'sources', 'categories']
+              for key in required_keys:
+                  if key not in data:
+                      print(f'ERROR: Missing \"{key}\" key in definitions.yaml')
+                      sys.exit(1)
+
+              # Validate sources structure (list of source objects)
+              if not isinstance(data['sources'], list):
+                  print('ERROR: \"sources\" must be a list')
                   sys.exit(1)
 
-              # Count error codes
+              # Count error codes across all categories
               total_errors = 0
-              for source_name, source_data in data['sources'].items():
-                  if 'errors' in source_data:
-                      total_errors += len(source_data['errors'])
+              if isinstance(data['categories'], dict):
+                  for category_name, category_data in data['categories'].items():
+                      if isinstance(category_data, dict) and 'errors' in category_data:
+                          total_errors += len(category_data['errors'])
 
-              print(f'✓ Validation passed: {total_errors} error codes defined')
+              print(f'✓ Validation passed')
+              print(f'✓ Project: {data.get(\"project_name\", \"Unknown\")}')
+              print(f'✓ Version: {data.get(\"version\", \"Unknown\")}')
+              print(f'✓ Sources: {len(data[\"sources\"])}')
+              print(f'✓ Error codes: {total_errors}')
 
-              # Extract version if present
+              # Extract version comment from top of file
               with open('definitions.yaml', 'r') as f:
                   first_lines = [f.readline() for _ in range(20)]
                   for line in first_lines:

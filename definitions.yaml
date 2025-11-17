@@ -185,7 +185,7 @@
 
 project_name: "Polarity"
 prefix: "POLARITY_ERR"
-version: "2.17.0"
+version: "2.18.0"
 
 # Error Source Tracking (for app team visibility)
 sources:
