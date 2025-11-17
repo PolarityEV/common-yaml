@@ -109,9 +109,7 @@
 # - RENAMED: CHARGER1_* → CHARGER_CAN2_* (charger on CAN2 bus)
 # - RENAMED: CHARGER2_* → CHARGER_CAN3_* (charger on CAN3 bus)
 # - ADDED: CHARGER_CAN1_* error codes (reserved for future hardware)
-# - RENAMED: CURRENT_SENSOR1_* → CURRENT_SENSOR_CAN3_* (sensor on CAN3)
-# - RENAMED: CURRENT_SENSOR2_* → CURRENT_SENSOR_CAN2_* (reserved, future hardware)
-# - RENAMED: CURRENT_SENSOR3_* → CURRENT_SENSOR_CAN1_* (reserved, future hardware)
+# - RENAMED: CURRENT_SENSOR_* → CURRENT_SENSOR_CAN3_* (sensor on CAN3)
 # - RENAMED: IMD_* → IMD_CAN3_* (IMD on CAN3 bus)
 # - ADDED: IMD_CAN2_* error codes (0x00A2-0x00A6, reserved for future hardware)
 # - ADDED: IMD_CAN1_* error codes (0x00A7-0x00AB, reserved for future hardware)
@@ -992,46 +990,6 @@ categories:
       - name: "CURRENT_SENSOR_CAN3_POWER_FAULT"
         code: "0x0070"
         description: "Current Sensor on CAN3 power fault (under/over voltage or internal error) [CAN ID 0x3C4]"
-        severity: "error"
-
-      - name: "CURRENT_SENSOR_CAN2_TIMEOUT"
-        code: "0x0072"
-        description: "Current Sensor on CAN2 communication timeout (>1s) [Reserved for future hardware]"
-        severity: "error"
-
-      - name: "CURRENT_SENSOR_CAN2_INVALID_DATA"
-        code: "0x0073"
-        description: "Current Sensor on CAN2 reports invalid current reading [Reserved for future hardware]"
-        severity: "warning"
-
-      - name: "CURRENT_SENSOR_CAN2_OUT_OF_RANGE"
-        code: "0x0074"
-        description: "Current Sensor on CAN2 out of range (>±1550A) [Reserved for future hardware]"
-        severity: "warning"
-
-      - name: "CURRENT_SENSOR_CAN2_POWER_FAULT"
-        code: "0x0075"
-        description: "Current Sensor on CAN2 power fault (under/over voltage or internal error) [Reserved for future hardware]"
-        severity: "error"
-
-      - name: "CURRENT_SENSOR_CAN1_TIMEOUT"
-        code: "0x0077"
-        description: "Current Sensor on CAN1 communication timeout (>1s) [Reserved for future hardware]"
-        severity: "error"
-
-      - name: "CURRENT_SENSOR_CAN1_INVALID_DATA"
-        code: "0x0078"
-        description: "Current Sensor on CAN1 reports invalid current reading [Reserved for future hardware]"
-        severity: "warning"
-
-      - name: "CURRENT_SENSOR_CAN1_OUT_OF_RANGE"
-        code: "0x0079"
-        description: "Current Sensor on CAN1 out of range (>±1550A) [Reserved for future hardware]"
-        severity: "warning"
-
-      - name: "CURRENT_SENSOR_CAN1_POWER_FAULT"
-        code: "0x007A"
-        description: "Current Sensor on CAN1 power fault (under/over voltage or internal error) [Reserved for future hardware]"
         severity: "error"
 
   GATEWAY:
