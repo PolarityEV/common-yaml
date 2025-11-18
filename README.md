@@ -329,7 +329,7 @@ Debug error codes (MSB=1) provide detailed diagnostic information for developmen
 - **Range:** 0x8000-0xFFFF (bit 15 set for easy filtering)
 - **Default State:** Enabled (ON) for development
 - **Filter Check:** `if (errorCode >= 0x8000 && !g_ErrorBufferConfig.DebugErrorsEnabled)`
-- **Control:** UART command `VCU_CMD_DEBUG_CONTROL` (0x05/0x85)
+- **Control:** UART command `VCU_CMD_DEBUG_CONTROL` (0x0C/0x8C)
 - **Implementation:** Filtering happens at `ErrorBuffer_Push()` - debug errors are silently discarded when disabled
 
 ### Current Debug Error Codes
@@ -375,7 +375,7 @@ A: Make sure `POLARITY_ENABLE_LEGACY_NAMES` is defined *before* the include:
 A: Create a new template in `templates/` and add a generation function in `generate.py`
 
 **Q: Debug errors not appearing?**
-A: Check `g_ErrorBufferConfig.DebugErrorsEnabled` is set to `1`, or enable via UART DEBUG_CONTROL command (0x05)
+A: Check `g_ErrorBufferConfig.DebugErrorsEnabled` is set to `1`, or enable via UART DEBUG_CONTROL command (0x0C)
 
 ## Support
 
