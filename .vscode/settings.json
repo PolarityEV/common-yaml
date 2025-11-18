@@ -1,3 +1,4 @@
 {
-  "ansible.python.interpreterPath": "/bin/python"
+  "ansible.python.interpreterPath": "/bin/python",
+  "idf.pythonInstallPath": "/Users/bastian/.pyenv/shims/python"
 }

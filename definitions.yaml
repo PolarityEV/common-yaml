@@ -2,6 +2,20 @@
 # Single source of truth for error codes across all platforms
 # Supports: C (STM32), C (ESP32), Dart (Flutter)
 #
+# Version 2.19.0 - Debug Error Level and 12V Tender Debug Codes (2025-11-17)
+# NEW: Added debug error severity level (0x8000-0xFFFF range, MSB=1 for easy filtering)
+# NEW: Added 12V tender debug error codes (0x8000-0x8006) for interlock diagnostics
+# - DEBUG_VOLT12_TENDER_IGNITION_ON: Ignition preventing 12V tender charging
+# - DEBUG_VOLT12_TENDER_HV_CHARGING: HV charging active blocking 12V tender
+# - DEBUG_VOLT12_TENDER_CHARGEPORT_TIMEOUT: Charge port communication timeout
+# - DEBUG_VOLT12_TENDER_CHARGEPORT_NOT_DETECTED: Charge port not found on CAN bus
+# - DEBUG_VOLT12_TENDER_DCDC_NULL: DCDC charger pointer is NULL
+# - DEBUG_VOLT12_TENDER_DCDC_NOT_DETECTED: DCDC not responding on CAN bus
+# - DEBUG_VOLT12_TENDER_VOLTAGE_ABOVE_THRESHOLD: 12V voltage above start threshold
+# REASON: Enable detailed interlock diagnostics without cluttering production error logs
+# IMPACT: Debug errors can be toggled via UART DEBUG_CONTROL command (default: ON for development)
+# MIGRATION: Error buffer filters debug errors (>= 0x8000) when DebugErrorsEnabled=0
+#
 # Version 2.18.0 - 12V Battery Tender Diagnostic Error Codes (2025-11-17)
 # NEW: Added 12V tender diagnostic error codes (0x00EC-0x00F0) for Phase 7 implementation
 # - VOLT12_TENDER_BLOCKED_INTERLOCKS: Safety interlocks preventing charging (info)
@@ -169,6 +183,7 @@
 # ============================================================
 # Error Code Ranges (Quick Reference)
 # ============================================================
+# Production Error Codes (0x0000-0x7FFF):
 # 0x0008-0x0020: CAN bus errors (initialization, queue, transmission)
 # 0x0021-0x00AB: VCU peripherals and system (timers, UART, IMD, etc.)
 # 0x0031-0x0041: BMS faults (undervoltage, overvoltage, isolation)
@@ -181,11 +196,15 @@
 # 0x009D-0x00A1: Insulation monitoring device (IMD, CAN3)
 # 0x00AC-0x00B7: Charging state machine v2.0 (precharge, permission, shutdown)
 # 0x00D0-0x00D9: Charging safety gates and STM32 charge controller faults
+# 0x00E7-0x00F0: 12V battery tender (automatic 12V maintenance charging)
+#
+# Debug Error Codes (0x8000-0xFFFF, MSB=1 for filtering):
+# 0x8000-0x8006: 12V battery tender debug (interlock diagnostics)
 # ============================================================
 
 project_name: "Polarity"
 prefix: "POLARITY_ERR"
-version: "2.18.0"
+version: "2.19.0"
 
 # Error Source Tracking (for app team visibility)
 sources:
@@ -1483,3 +1502,58 @@ categories:
         description: "Self-test failed during initialization - hardware validation error"
         severity: "error"
         note: "One or more hardware validation tests failed during boot sequence. Check specific test results for details (GPOD outputs, CAN bus, EEPROM). If test is non-fatal, system will continue boot with degraded functionality."
+
+  # ============================================================================
+  # DEBUG ERROR CODES (0x8000-0xFFFF)
+  # ============================================================================
+  # Debug errors are filtered when DebugErrorsEnabled=0 (production mode)
+  # MSB=1 allows easy filtering: (errorCode >= 0x8000)
+  # Default: ON for development, can be toggled via UART DEBUG_CONTROL command
+  # ============================================================================
+  DEBUG:
+    description: "Debug-level diagnostic errors (development/troubleshooting only)"
+    source: "STM32_VCU"
+    errors:
+      # 12V Battery Tender Debug (0x8000-0x8006)
+      # Detailed interlock diagnostics for troubleshooting tender failures
+      - name: "DEBUG_VOLT12_TENDER_IGNITION_ON"
+        code: "0x8000"
+        description: "12V tender blocked - ignition is ON"
+        severity: "debug"
+        note: "Ignition state preventing 12V tender from starting. This is normal - tender only operates when vehicle is parked with ignition OFF. Tender will resume when ignition turns OFF."
+
+      - name: "DEBUG_VOLT12_TENDER_HV_CHARGING"
+        code: "0x8001"
+        description: "12V tender blocked - HV charging active"
+        severity: "debug"
+        note: "High-voltage charging in progress, blocking 12V tender. This is normal - HV charging takes priority and DCDC charges 12V during HV charge session. Tender will resume after HV charging completes."
+
+      - name: "DEBUG_VOLT12_TENDER_CHARGEPORT_TIMEOUT"
+        code: "0x8002"
+        description: "12V tender blocked - charge port communication timeout"
+        severity: "debug"
+        note: "Charge port controller (STM32) not responding on CAN bus (>1s timeout). 12V voltage measurement unavailable. Check charge port CAN wiring, power, and firmware. Tender will resume when communication restored."
+
+      - name: "DEBUG_VOLT12_TENDER_CHARGEPORT_NOT_DETECTED"
+        code: "0x8003"
+        description: "12V tender blocked - charge port not detected"
+        severity: "debug"
+        note: "Charge port controller not detected during 10-second detection window after boot. 12V voltage sensor unavailable. Check charge port CAN bus assignment, wiring, and power. Tender will resume if charge port detected."
+
+      - name: "DEBUG_VOLT12_TENDER_DCDC_NULL"
+        code: "0x8004"
+        description: "12V tender blocked - DCDC charger pointer is NULL"
+        severity: "debug"
+        note: "DCDC charger not assigned in VCU configuration (vcu.Chargers.DCDCCharger == NULL). Check main.c initialization - DCDC should be assigned to one of the three charger instances. This is a firmware configuration issue."
+
+      - name: "DEBUG_VOLT12_TENDER_DCDC_NOT_DETECTED"
+        code: "0x8005"
+        description: "12V tender blocked - DCDC charger not detected on CAN bus"
+        severity: "debug"
+        note: "DCDC charger configured but not responding on CAN bus (IsDetected=0). Check DCDC hardware, CAN wiring, and firmware. DCDC may still charge during ignition ON if hardware is functional."
+
+      - name: "DEBUG_VOLT12_TENDER_VOLTAGE_ABOVE_THRESHOLD"
+        code: "0x8006"
+        description: "12V tender idle - battery voltage above start threshold"
+        severity: "debug"
+        note: "12V battery voltage is healthy (above configured start threshold, default 12.4V). No charging needed. Tender monitoring voltage and will start charging if voltage drops below threshold."

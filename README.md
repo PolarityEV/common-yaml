@@ -320,6 +320,45 @@ Add to your CI pipeline:
 ✅ **Build-time generation** - Can be part of automated build
 ✅ **Documentation** - Auto-generates human-readable descriptions
 
+## Debug Error Codes (0x8000-0xFFFF)
+
+### Overview
+Debug error codes (MSB=1) provide detailed diagnostic information for development and troubleshooting without cluttering production error logs. They can be toggled at runtime via UART DEBUG_CONTROL command.
+
+### Filtering Mechanism
+- **Range:** 0x8000-0xFFFF (bit 15 set for easy filtering)
+- **Default State:** Enabled (ON) for development
+- **Filter Check:** `if (errorCode >= 0x8000 && !g_ErrorBufferConfig.DebugErrorsEnabled)`
+- **Control:** UART command `VCU_CMD_DEBUG_CONTROL` (0x05/0x85)
+- **Implementation:** Filtering happens at `ErrorBuffer_Push()` - debug errors are silently discarded when disabled
+
+### Current Debug Error Codes
+
+#### 12V Battery Tender Debug (0x8000-0x8006)
+Detailed interlock diagnostics for troubleshooting 12V tender failures:
+
+- `0x8000`: `DEBUG_VOLT12_TENDER_IGNITION_ON` - Ignition is ON (blocking tender)
+- `0x8001`: `DEBUG_VOLT12_TENDER_HV_CHARGING` - HV charging active (blocking tender)
+- `0x8002`: `DEBUG_VOLT12_TENDER_CHARGEPORT_TIMEOUT` - Charge port timeout
+- `0x8003`: `DEBUG_VOLT12_TENDER_CHARGEPORT_NOT_DETECTED` - Charge port not detected
+- `0x8004`: `DEBUG_VOLT12_TENDER_DCDC_NULL` - DCDC pointer is NULL
+- `0x8005`: `DEBUG_VOLT12_TENDER_DCDC_NOT_DETECTED` - DCDC not detected on CAN
+- `0x8006`: `DEBUG_VOLT12_TENDER_VOLTAGE_ABOVE_THRESHOLD` - Voltage healthy, no charge needed
+
+### Adding New Debug Errors
+1. Choose code in 0x8000-0xFFFF range (reserve ranges by module)
+2. Add to `definitions.yaml` under `DEBUG:` category with `severity: "debug"`
+3. Regenerate headers: `cd common && python3 generate.py`
+4. Use like normal errors: `VCU_PushError(vcu, POLARITY_ERR_DEBUG_...)`
+5. Debug errors automatically filtered when `g_ErrorBufferConfig.DebugErrorsEnabled = 0`
+
+### Reserved Debug Error Ranges
+- `0x8000-0x8FFF`: VCU subsystems (12V tender, GPOD, etc.)
+- `0x9000-0x9FFF`: Charging system debug
+- `0xA000-0xAFFF`: Motor/LDU debug
+- `0xB000-0xBFFF`: BMS debug
+- `0xC000-0xFFFF`: Reserved for future modules
+
 ## Troubleshooting
 
 **Q: Getting "Module not found" errors?**
@@ -334,6 +373,9 @@ A: Make sure `POLARITY_ENABLE_LEGACY_NAMES` is defined *before* the include:
 
 **Q: Want to add a new language?**
 A: Create a new template in `templates/` and add a generation function in `generate.py`
+
+**Q: Debug errors not appearing?**
+A: Check `g_ErrorBufferConfig.DebugErrorsEnabled` is set to `1`, or enable via UART DEBUG_CONTROL command (0x05)
 
 ## Support
 
