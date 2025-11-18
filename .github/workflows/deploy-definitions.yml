@@ -32,30 +32,103 @@ jobs:
               with open('definitions.yaml', 'r') as f:
                   data = yaml.safe_load(f)
 
+              errors = []
+
               # Validate required top-level keys
               required_keys = ['project_name', 'prefix', 'sources', 'categories']
               for key in required_keys:
                   if key not in data:
-                      print(f'ERROR: Missing \"{key}\" key in definitions.yaml')
-                      sys.exit(1)
+                      errors.append(f'Missing required top-level key: \"{key}\"')
 
               # Validate sources structure (list of source objects)
-              if not isinstance(data['sources'], list):
-                  print('ERROR: \"sources\" must be a list')
-                  sys.exit(1)
+              if not isinstance(data.get('sources'), list):
+                  errors.append('\"sources\" must be a list')
 
-              # Count error codes across all categories
+              # Validate error codes
+              seen_codes = {}
               total_errors = 0
-              if isinstance(data['categories'], dict):
+              required_error_fields = ['name', 'code', 'description', 'severity']
+
+              if isinstance(data.get('categories'), dict):
                   for category_name, category_data in data['categories'].items():
-                      if isinstance(category_data, dict) and 'errors' in category_data:
-                          total_errors += len(category_data['errors'])
+                      # Validate category structure
+                      if not isinstance(category_data, dict):
+                          errors.append(f'Category \"{category_name}\" must be a dict')
+                          continue
+
+                      if 'errors' not in category_data:
+                          errors.append(f'Category \"{category_name}\" missing \"errors\" list')
+                          continue
+
+                      if not isinstance(category_data['errors'], list):
+                          errors.append(f'Category \"{category_name}\" errors must be a list')
+                          continue
+
+                      # Validate each error
+                      for idx, error in enumerate(category_data['errors']):
+                          if not isinstance(error, dict):
+                              errors.append(f'{category_name}[{idx}]: Error must be a dict')
+                              continue
+
+                          # Check required fields
+                          for field in required_error_fields:
+                              if field not in error:
+                                  errors.append(f'{category_name}[{idx}]: Missing required field \"{field}\"')
+
+                          # Check for extra fields (allow SINE protocol fields for MOTOR category)
+                          allowed_fields = {'name', 'code', 'description', 'severity', 'note'}
+                          if category_name == 'MOTOR':
+                              # MOTOR errors can have SINE protocol mapping fields
+                              allowed_fields.update({'sine_error_type', 'sine_error_code', 'sine_error_name', 'action'})
+
+                          extra_fields = set(error.keys()) - allowed_fields
+                          if extra_fields:
+                              errors.append(f'{category_name}[{idx}] ({error.get(\"name\", \"?\")}): Unexpected fields: {extra_fields}')
+
+                          # Validate code format and uniqueness
+                          if 'code' in error:
+                              code_str = error['code']
+                              if isinstance(code_str, str) and code_str.startswith('0x'):
+                                  try:
+                                      code_int = int(code_str, 16)
+
+                                      # Check 16-bit range
+                                      if code_int < 0 or code_int > 0xFFFF:
+                                          errors.append(f'{error.get(\"name\", \"?\")} ({code_str}): Code outside 16-bit range')
+
+                                      # Check for duplicates
+                                      if code_int in seen_codes:
+                                          errors.append(f'{error.get(\"name\", \"?\")} ({code_str}): Duplicate code (also used by {seen_codes[code_int]})')
+                                      else:
+                                          seen_codes[code_int] = error.get('name', '?')
+
+                                  except ValueError:
+                                      errors.append(f'{error.get(\"name\", \"?\")} ({code_str}): Invalid hex format')
+                              else:
+                                  errors.append(f'{error.get(\"name\", \"?\")} ({error.get(\"code\", \"?\")}): Code must be hex string like \"0x0001\"')
+
+                          # Validate severity values
+                          valid_severities = {'info', 'warning', 'error', 'critical', 'debug'}
+                          if 'severity' in error and error['severity'] not in valid_severities:
+                              errors.append(f'{error.get(\"name\", \"?\")} ({error.get(\"code\", \"?\")}): Invalid severity \"{error[\"severity\"]}\" (must be one of: {valid_severities})')
+
+                          total_errors += 1
+
+              # Print errors or success
+              if errors:
+                  print(f'ERROR: Validation failed with {len(errors)} errors:')
+                  for i, err in enumerate(errors, 1):
+                      print(f'  {i}. {err}')
+                  sys.exit(1)
 
               print(f'✓ Validation passed')
               print(f'✓ Project: {data.get(\"project_name\", \"Unknown\")}')
               print(f'✓ Version: {data.get(\"version\", \"Unknown\")}')
-              print(f'✓ Sources: {len(data[\"sources\"])}')
+              print(f'✓ Categories: {len(data.get(\"categories\", {}))}')
+              print(f'✓ Sources: {len(data.get(\"sources\", []))}')
               print(f'✓ Error codes: {total_errors}')
+              print(f'✓ Unique codes: {len(seen_codes)}')
+              print(f'✓ Code range: 0x{min(seen_codes.keys()):04X} - 0x{max(seen_codes.keys()):04X}')
 
               # Extract version comment from top of file
               with open('definitions.yaml', 'r') as f:
@@ -70,6 +143,8 @@ jobs:
               sys.exit(1)
           except Exception as e:
               print(f'ERROR: Validation failed: {e}')
+              import traceback
+              traceback.print_exc()
               sys.exit(1)
           "
 
