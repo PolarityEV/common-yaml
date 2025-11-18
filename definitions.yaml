@@ -1022,7 +1022,7 @@ categories:
         severity: "error"
 
   GATEWAY:
-    description: "BLE Gateway communication errors (UART bridge to VCU)"
+    description: "BLE Gateway communication errors and telemetry (UART bridge to VCU)"
     source: "BLE_GATEWAY"
     errors:
       - name: "GATEWAY_UART_TIMEOUT"
@@ -1557,3 +1557,63 @@ categories:
         description: "12V tender idle - battery voltage above start threshold"
         severity: "debug"
         note: "12V battery voltage is healthy (above configured start threshold, default 12.4V). No charging needed. Tender monitoring voltage and will start charging if voltage drops below threshold."
+
+# ============================================================
+# Data Structures (for BLE telemetry and diagnostics)
+# ============================================================
+# These structures are generated as C structs for use in ESP32 firmware
+# Used for BLE mode responses that expose internal telemetry
+structures:
+  - name: "GatewayUartTelemetry"
+    description: "UART communication statistics for BLE gateway diagnostics"
+    size_bytes: 28
+    fields:
+      - name: "total_transactions"
+        type: "uint32_t"
+        offset: 0
+        description: "Total UART transactions attempted since boot"
+
+      - name: "success_count"
+        type: "uint32_t"
+        offset: 4
+        description: "Number of successful UART transactions"
+
+      - name: "timeout_count"
+        type: "uint16_t"
+        offset: 8
+        description: "Number of UART timeout errors"
+
+      - name: "invalid_response_count"
+        type: "uint16_t"
+        offset: 10
+        description: "Number of invalid response errors"
+
+      - name: "bus_error_count"
+        type: "uint16_t"
+        offset: 12
+        description: "Number of UART bus errors"
+
+      - name: "protocol_error_count"
+        type: "uint16_t"
+        offset: 14
+        description: "Number of UART protocol errors"
+
+      - name: "last_error_code"
+        type: "uint16_t"
+        offset: 16
+        description: "Last error code encountered (Polarity error code)"
+
+      - name: "last_error_timestamp_ms"
+        type: "uint32_t"
+        offset: 18
+        description: "Timestamp of last error (milliseconds since boot)"
+
+      - name: "success_rate_percent"
+        type: "uint8_t"
+        offset: 22
+        description: "Success rate percentage (0-100)"
+
+      - name: "reserved"
+        type: "uint8_t[5]"
+        offset: 23
+        description: "Reserved for future use (padding to 28 bytes)"
