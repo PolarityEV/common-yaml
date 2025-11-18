@@ -86,7 +86,7 @@ jobs:
             --metadata "deployment-time=$(date -u +%Y-%m-%dT%H:%M:%SZ),git-sha=${{ github.sha }}"
 
           echo "✓ Deployed to s3://polarity.firmware/definitions/latest.yaml"
-          echo "✓ Public URL: https://polarity.firmware.s3.amazonaws.com/definitions/latest.yaml"
+          echo "✓ Public URL: https://s3.us-east-1.amazonaws.com/polarity.firmware/definitions/latest.yaml"
 
       - name: Deployment summary
         run: |
@@ -94,6 +94,6 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**File:** \`definitions.yaml\`" >> $GITHUB_STEP_SUMMARY
           echo "**S3 Path:** \`s3://polarity.firmware/definitions/latest.yaml\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Public URL:** https://polarity.firmware.s3.amazonaws.com/definitions/latest.yaml" >> $GITHUB_STEP_SUMMARY
+          echo "**Public URL:** https://s3.us-east-1.amazonaws.com/polarity.firmware/definitions/latest.yaml" >> $GITHUB_STEP_SUMMARY
           echo "**Git SHA:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Timestamp:** $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_STEP_SUMMARY
