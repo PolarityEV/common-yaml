@@ -600,15 +600,15 @@ categories:
       # ============================================================================
       - name: "IMD_NOT_DETECTED"
         code: "0x00DF"
-        description: "IMD not detected after 15 seconds - check 12V power and HV connections"
-        severity: "warning"
-        note: "Bender IMD should transmit ID 0x037 automatically at power-on (no wake-up message needed). Check 12V power (Pin 2), HV measurement wires (HV+, HV-, PE), and CAN termination. May indicate defective IMD or loose wiring."
+        description: "IMD not detected - optional hardware check"
+        severity: "info"
+        note: "Bender IMD should transmit ID 0x037 automatically at power-on if installed. This is an optional component - if not installed, this message is informational only. If IMD should be present, check 12V power (Pin 2), HV measurement wires (HV+, HV-, PE), and CAN termination."
 
       - name: "CURRENT_SENSOR_NOT_DETECTED"
         code: "0x00E0"
-        description: "Current sensor not detected after 15 seconds - check 12V power and CAN connections"
-        severity: "warning"
-        note: "ISA Scale IVT-S current sensor should transmit ID 0x3C4 automatically at power-on. Check 12V power, CAN wiring (CANH/CANL), and CAN termination. May indicate defective sensor or loose wiring."
+        description: "Current sensor not detected - optional hardware check"
+        severity: "info"
+        note: "ISA Scale IVT-S current sensor should transmit ID 0x3C4 automatically at power-on if installed. This is an optional component - if not installed, this message is informational only. If sensor should be present, check 12V power, CAN wiring (CANH/CANL), and CAN termination."
 
       # ============================================================================
       # I2C EEPROM ERROR CODES (0x00E1-0x00E3)
@@ -651,7 +651,7 @@ categories:
       - name: "VOLT12_TENDER_BLOCKED_INTERLOCKS"
         code: "0x00EC"
         description: "12V battery tender blocked by safety interlocks"
-        severity: "info"
+        severity: "warning"
         note: "Automatic 12V charging blocked due to active safety conditions (ignition ON, HV charging active, or charge port unavailable). This is normal operation - tender will resume when vehicle returns to idle state."
 
       - name: "VOLT12_TENDER_DCDC_UNAVAILABLE"
